@@ -1,0 +1,83 @@
+\documentclass[10pt,a4paper]{article}
+
+\input{AEDmacros}
+\usepackage{caratula} % Version modificada para usar las macros de algo1 de ~> https://github.com/bcardiff/dc-tex
+\usepackage{dirtytalk}
+
+% Custom macros
+\newcommand{\ciudad}{\ensuremath{\langle \mathsf{String} , \ent \rangle}}
+
+\titulo{Trabajo práctico 1: Especificaci´on y WP}
+\subtitulo{En búsqueda del camino}
+
+\fecha{\today}
+
+\materia{Algoritmos Y Estructura de Datos}
+\grupo{Grupo QUKDCOGWWYZWJZQBIYWM}
+
+\integrante{Gomez Salaverri, Francisco Nicolas}{550/15}{fsalaverri@dc.uba.ar}
+\integrante{Apellido, Nombre2}{002/01}{email2@dominio.com}
+\integrante{Apellido, Nombre3}{003/01}{email3@dominio.com}
+\integrante{Apellido, Nombre4}{004/01}{email4@dominio.com}
+% Pongan cuantos integrantes quieran
+
+% Declaramos donde van a estar las figuras
+% No es obligatorio, pero suele ser comodo
+\graphicspath{{../static/}}
+
+
+% Document
+\begin{document}
+
+\maketitle
+
+\section{Problemas}
+A continuación, se presentan los procedimientos solicitados en el enunciado del trabajo, junto con las definiciones, funciones auxiliares y predicados que forman parte de la especificación del problema 'En búsqueda del camino' de este trabajo práctico.
+
+\subsection{Definiciones}
+Las siguientes definiciones se utilizan para proporcionar mayor claridad y legibilidad al trabajo.
+
+Ciudad:   \ciudad
+
+
+\subsection{Procedimientos}
+
+
+\begin{proc}{grandesCiudades}{\In ciudades : \TLista{Ciudad}}{ \TLista{Ciudad}}
+	\requiere{expresionBooleana1}
+	\asegura{expresionBooleana2}
+\end{proc}
+
+\begin{proc}{sumaDeHabitantes}{\In menoresDeCiudades : \TLista{Ciudad}, \In mayoresDeCiudades : \TLista{Ciudad}}{ \TLista{Ciudad}}
+	\requiere{expresionBooleana1}
+	\asegura{expresionBooleana2}
+\end{proc}
+
+\begin{proc}{hayCamino}{\In distancias : \TLista{\TLista{\ent}}, in desde: \ent, hasta: \ent}{ \bool}
+	\requiere{expresionBooleana1}
+	\asegura{expresionBooleana2}
+\end{proc}
+
+\begin{proc}{cantidadCaminosNSaltos}{\Inout conexion : \TLista{\TLista{\ent}}, \In n: \ent}{}
+	\requiere{expresionBooleana1}
+	\asegura{expresionBooleana2}
+\end{proc}
+
+
+\begin{proc}{caminoMínimo}{\In origen:\ent , \In destines: \ent , \In distancias : \TLista{\TLista{\ent}}}{ \TLista{\ent}}
+	\requiere{expresionBooleana1}
+	\asegura{expresionBooleana2}
+\end{proc}
+
+\subsection{Auxiliares}
+\aux{auxiliar1}{parametros}{tipoRes}{expresion}
+
+\subsection{Predicados}
+\pred{pred1}{parametros}{expresion} 
+
+\section{Demostraciones de correctitud}
+
+En el siguiente apartado, demostraremos la corrección del código solicitado \say{poblaciónTotal} en relación con la especificación proporcionada para dicho problema.  \say{La función poblaciónTotal recibe una lista de ciudades donde al menos una de ellas es grande (es decir, supera los
+50.000 habitantes) y devuelve la cantidad total de habitantes.}
+
+\end{document}
