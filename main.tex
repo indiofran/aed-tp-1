@@ -50,11 +50,19 @@ Ciudad:   \ciudad
 	\asegura{\paraTodo[unalinea]{i}{\ent}{enRango(i, ciudades) \yLuego ciudades[i][1] > 50000 \implica ciudades[i] = res[i]}}
 \end{proc}
 
-\begin{proc}{sumaDeHabitantes}{\In menoresDeCiudades : \TLista{Ciudad}, \In mayoresDeCiudades : \TLista{Ciudad}}{ \TLista{Ciudad}}
-	\requiere{|menoresDeCiudades| = |mayoresDeCiudades| \land todasCiudadesDistintas(menoresDeCiudades) \land \\
-	tienenMismosNombres(menoresDeCiudades, mayoresDeCiudades)}
-	\asegura{|res| = |menoresDeCiudades| \land tienenMismosNombres(res, menoresDeCiudades) \land \\
-	\paraTodo{c}{Ciudad}{c \in res \Then c_1 = cantidadHabitantes(c_0, menoresDeCiudades) + cantidadHabitantes(c_0, mayoresDeCiudades)}}
+\begin{proc}{sumaDeHabitantes}
+{\In menoresDeCiudades : \TLista{Ciudad}, \In mayoresDeCiudades : \TLista{Ciudad}}{ \TLista{Ciudad}}
+
+	\requiere{ \\
+	 |menoresDeCiudades| = |mayoresDeCiudades| \land \\
+	 todasCiudadesDistintas(menoresDeCiudades) \land \\
+	 tienenMismosNombres(menoresDeCiudades, mayoresDeCiudades) \\
+	 }
+	\asegura{\\ 
+	|res| = |menoresDeCiudades| \land \\
+	 tienenMismosNombres(res, menoresDeCiudades) \land \\
+	\paraTodo[unalinea]{c}{Ciudad}{c \in res \Then \\ c_1 = cantidadHabitantes(c_0, menoresDeCiudades) + cantidadHabitantes(c_0, mayoresDeCiudades)} \\
+	 }
 \end{proc}
 
 \begin{proc}{hayCamino}{\In distancias : \matrizEnt, in desde: \ent, hasta: \ent}{ \bool}
