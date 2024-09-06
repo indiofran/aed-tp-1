@@ -99,9 +99,9 @@ Ciudad:   \ciudad
 {
 	\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matriz| \implicaLuego \longitud{matriz[i]} = \longitud{matriz}}
 }
-\pred{existeCamino}{matriz: \matrizEnt, desde, hasta: \ent} {
+\pred{existeCamino}{distancias: \matrizEnt, desde: \ent, hasta: \ent} {
 	\existe {s} {\TLista{\ent}} {
-		secuenciaEnMatriz(s, distancia)  \yLuego caminoValido(s,distancia, desde, hasta)
+		secuenciaEnMatriz(s, distancias)  \yLuego caminoValido(s,distancias, desde, hasta)
 	}
 }
 \pred{secuenciaEnMatriz}{secuencia: \TLista{\ent}, matriz: \matrizEnt} {
