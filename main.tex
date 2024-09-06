@@ -6,6 +6,8 @@
 
 % Custom macros
 \newcommand{\ciudad}{\ensuremath{\langle \mathsf{String} , \ent \rangle}}
+% Custom macros
+\newcommand{\matrizEnt}{\TLista{\TLista{\ent}}}
 
 \titulo{Trabajo práctico 1: Especificaci´on y WP}
 \subtitulo{En búsqueda del camino}
@@ -53,9 +55,9 @@ Ciudad:   \ciudad
 	\asegura{expresionBooleana2}
 \end{proc}
 
-\begin{proc}{hayCamino}{\In distancias : \TLista{\TLista{\ent}}, in desde: \ent, hasta: \ent}{ \bool}
-	\requiere{expresionBooleana1}
-	\asegura{expresionBooleana2}
+\begin{proc}{hayCamino}{\In distancias : \matrizEnt, in desde: \ent, hasta: \ent}{ \bool}
+	\requiere{ 0 \leq desde,hasta < \longitud{distancias} \wedge esMatrizCuadrada(distancias)}
+	\asegura{res = \True \Iff ExisteCamnino(distancias, desde, hasta)}
 \end{proc}
 
 \begin{proc}{cantidadCaminosNSaltos}{\Inout conexion : \TLista{\TLista{\ent}}, \In n: \ent}{}
@@ -73,11 +75,45 @@ Ciudad:   \ciudad
 \aux{auxiliar1}{parametros}{tipoRes}{expresion}
 
 \subsection{Predicados}
-\pred{pred1}{parametros}{expresion} 
+
+\pred{esMatrizCuadrad}{matriz: \matrizEnt, }
+{
+ (\forall i: \ent)(enRango(i,matriz)) \implicaLuego \longitud{matriz[i}] = \longitud{matriz} 
+} 
+\pred{existeCamino}{matriz: \matrizEnt} {
+	\existe {s} {\ent} {
+	secuenciaEnMatriz(s, distancia)  \land 				    caminoValido(s,distancia)
+	}
+}
+\pred{secuenciaEnMatriz}{secuencia: \TLista{\ent}, matriz: \matrizEnt} {
+ \paraTodo {i} {\ent}{enRango(i,secuencia) } 
+ \yLuego 0 \leq secuencia[i] < \longitud{matrix} 
+}
+
+
+\pred{caminoValido}
+{camino: \TLista{\ent}, distancias: \matrizEnt, desde: \ent, hasta: \ent} 
+{
+	\longitud{camino} \geq 2 \yLuego \\  
+	camino[0] = desde \land  s[\longitud{camino} -1] = hasta \land \\ 
+	\paraTodo[unalinea]{i} {\ent} { 0 \leq i+1 < \longitud{distancias} \\  	\implicaLuego distancias \; [\;camino[i]\;] \; [\;camino[i+1]\;] \neq 0
+	}
+}
+
+\pred{enRango}{i: \ent, s: \TLista{\ent}}
+{
+ 0 \leq i < \longitud{s}
+}
+
+
+
+ 
 
 \section{Demostraciones de correctitud}
 
 En el siguiente apartado, demostraremos la corrección del código solicitado \say{poblaciónTotal} en relación con la especificación proporcionada para dicho problema.  \say{La función poblaciónTotal recibe una lista de ciudades donde al menos una de ellas es grande (es decir, supera los
 50.000 habitantes) y devuelve la cantidad total de habitantes.}
+
+
 
 \end{document}
