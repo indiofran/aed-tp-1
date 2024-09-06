@@ -51,23 +51,23 @@ Ciudad:   \ciudad
 \end{proc}
 
 \begin{proc}{sumaDeHabitantes}
-{\In menoresDeCiudades : \TLista{Ciudad}, \In mayoresDeCiudades : \TLista{Ciudad}}{ \TLista{Ciudad}}
+	{\In menoresDeCiudades : \TLista{Ciudad}, \In mayoresDeCiudades : \TLista{Ciudad}}{ \TLista{Ciudad}}
 
 	\requiere{ \\
-	 |menoresDeCiudades| = |mayoresDeCiudades| \land \\
-	 todasCiudadesDistintas(menoresDeCiudades) \land \\
-	 tienenMismosNombres(menoresDeCiudades, mayoresDeCiudades) \\
-	 }
-	\asegura{\\ 
-	|res| = |menoresDeCiudades| \land \\
-	 tienenMismosNombres(res, menoresDeCiudades) \land \\
-	\paraTodo[unalinea]{c}{Ciudad}{c \in res \Then \\ c_1 = cantidadHabitantes(c_0, menoresDeCiudades) + cantidadHabitantes(c_0, mayoresDeCiudades)} \\
-	 }
+		|menoresDeCiudades| = |mayoresDeCiudades| \land \\
+		todasCiudadesDistintas(menoresDeCiudades) \land \\
+		tienenMismosNombres(menoresDeCiudades, mayoresDeCiudades) \\
+	}
+	\asegura{\\
+		|res| = |menoresDeCiudades| \land \\
+		tienenMismosNombres(res, menoresDeCiudades) \land \\
+		\paraTodo[unalinea]{c}{Ciudad}{c \in res \Then \\ c_1 = cantidadHabitantes(c_0, menoresDeCiudades) + cantidadHabitantes(c_0, mayoresDeCiudades)} \\
+	}
 \end{proc}
 
 \begin{proc}{hayCamino}{\In distancias : \matrizEnt, in desde: \ent, hasta: \ent}{ \bool}
 	\requiere{ 0 \leq desde,hasta < \longitud{distancias} \wedge esMatrizCuadrada(distancias)}
-	\asegura{res = \True \Iff ExisteCamnino(distancias, desde, hasta)}
+	\asegura{res = \True \Iff existeCamino(distancias, desde, hasta)}
 \end{proc}
 
 \begin{proc}{cantidadCaminosNSaltos}{\Inout conexion : \TLista{\TLista{\ent}}, \In n: \ent}{}
@@ -95,33 +95,31 @@ Ciudad:   \ciudad
 	\paraTodo[unalinea]{c1}{Ciudad}{c1 \in ciudades1 \Then \existe[unalinea]{c2}{Ciudad}{c2 \in ciudades2 \land c1_0 = c2_0}}
 }
 
-\pred{esMatrizCuadrad}{matriz: \matrizEnt, }
+\pred{esMatrizCuadrada}{matriz: \matrizEnt}
 {
- (\forall i: \ent)(enRango(i,matriz)) \implicaLuego \longitud{matriz[i}] = \longitud{matriz}
+	\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matriz| \implicaLuego \longitud{matriz[i]} = \longitud{matriz}}
 }
-\pred{existeCamino}{matriz: \matrizEnt} {
-	\existe {s} {\ent} {
-	secuenciaEnMatriz(s, distancia)  \land 				    caminoValido(s,distancia)
+\pred{existeCamino}{matriz: \matrizEnt, desde, hasta: \ent} {
+	\existe {s} {\TLista{\ent}} {
+		secuenciaEnMatriz(s, distancia)  \yLuego caminoValido(s,distancia, desde, hasta)
 	}
 }
 \pred{secuenciaEnMatriz}{secuencia: \TLista{\ent}, matriz: \matrizEnt} {
- \paraTodo {i} {\ent}{enRango(i,secuencia) }
- \yLuego 0 \leq secuencia[i] < \longitud{matrix}
+	\paraTodo {i} {\ent}{enRango(i,secuencia) \implicaLuego 0 \leq secuencia[i] < \longitud{matriz}}
 }
 
 
 \pred{caminoValido}
 {camino: \TLista{\ent}, distancias: \matrizEnt, desde: \ent, hasta: \ent}
 {
-	\longitud{camino} \geq 2 \yLuego \\
-	camino[0] = desde \land  s[\longitud{camino} -1] = hasta \land \\
-	\paraTodo[unalinea]{i} {\ent} { 0 \leq i+1 < \longitud{distancias} \\  	\implicaLuego distancias \; [\;camino[i]\;] \; [\;camino[i+1]\;] \neq 0
-	}
+\longitud{camino} \geq 2 \yLuego \\
+camino[0] = desde \land  camino[\longitud{camino} -1] = hasta \land \\
+\paraTodo[unalinea]{i} {\ent} { 0 \leq i < \longitud{camino} - 1 \\  	\implicaLuego distancias \; [\;camino[i]\;] \; [\;camino[i+1]\;] \neq 0}
 }
 
 \pred{enRango}{i: \ent, s: \TLista{\ent}}
 {
- 0 \leq i < \longitud{s}
+	0 \leq i < \longitud{s}
 }
 
 
@@ -131,7 +129,7 @@ Ciudad:   \ciudad
 \section{Demostraciones de correctitud}
 
 En el siguiente apartado, demostraremos la corrección del código solicitado \say{poblaciónTotal} en relación con la especificación proporcionada para dicho problema.  \say{La función poblaciónTotal recibe una lista de ciudades donde al menos una de ellas es grande (es decir, supera los
-50.000 habitantes) y devuelve la cantidad total de habitantes.}
+	50.000 habitantes) y devuelve la cantidad total de habitantes.}
 
 
 
