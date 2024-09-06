@@ -7,7 +7,7 @@
 % Custom macros
 \newcommand{\ciudad}{\ensuremath{\langle \mathsf{String} , \ent \rangle}}
 
-\titulo{Trabajo práctico 1: Especificaci´on y WP}
+\titulo{Trabajo práctico 1: Especificación y WP}
 \subtitulo{En búsqueda del camino}
 
 \fecha{\today}
@@ -16,8 +16,8 @@
 \grupo{Grupo QUKDCOGWWYZWJZQBIYWM}
 
 \integrante{Gomez Salaverri, Francisco Nicolas}{550/15}{fsalaverri@dc.uba.ar}
-\integrante{Apellido, Nombre2}{002/01}{email2@dominio.com}
-\integrante{Apellido, Nombre3}{003/01}{email3@dominio.com}
+\integrante{Barberón, Federico Joaquín}{112/24}{jfedericobarberonj@gmail.com}
+\integrante{Fuertes Vila, Isabel}{474/92}{isblfv@gmail.com}
 \integrante{Apellido, Nombre4}{004/01}{email4@dominio.com}
 % Pongan cuantos integrantes quieran
 
@@ -44,13 +44,15 @@ Ciudad:   \ciudad
 
 
 \begin{proc}{grandesCiudades}{\In ciudades : \TLista{Ciudad}}{ \TLista{Ciudad}}
-	\requiere{expresionBooleana1}
-	\asegura{expresionBooleana2}
+	\requiere{|ciudades| \neq 0}
+	\asegura{\paraTodo[unalinea]{i}{\ent}{enRango(i, ciudades) \yLuego ciudades[i][1] > 50000 \implica ciudades[i] = res[i]}}
 \end{proc}
 
 \begin{proc}{sumaDeHabitantes}{\In menoresDeCiudades : \TLista{Ciudad}, \In mayoresDeCiudades : \TLista{Ciudad}}{ \TLista{Ciudad}}
-	\requiere{expresionBooleana1}
-	\asegura{expresionBooleana2}
+	\requiere{|menoresDeCiudades| = |mayoresDeCiudades| \land todasCiudadesDistintas(menoresDeCiudades) \land \\
+	tienenMismosNombres(menoresDeCiudades, mayoresDeCiudades)}
+	\asegura{|res| = |menoresDeCiudades| \land tienenMismosNombres(res, menoresDeCiudades) \land \\
+	\paraTodo{c}{Ciudad}{c \in res \Then c_1 = cantidadHabitantes(c_0, menoresDeCiudades) + cantidadHabitantes(c_0, mayoresDeCiudades)}}
 \end{proc}
 
 \begin{proc}{hayCamino}{\In distancias : \TLista{\TLista{\ent}}, in desde: \ent, hasta: \ent}{ \bool}
@@ -70,10 +72,18 @@ Ciudad:   \ciudad
 \end{proc}
 
 \subsection{Auxiliares}
-\aux{auxiliar1}{parametros}{tipoRes}{expresion}
+\aux{cantidadHabitantes}{nombre: \str, ciudades: \TLista{Ciudad}}{\ent}{\\
+	\displaystyle\sum_{i = 0}^{|ciudades| - 1} IfThenElse(ciudades[i]_0 = nombre, ciudades[i]_1, 0)
+}
 
 \subsection{Predicados}
-\pred{pred1}{parametros}{expresion} 
+\pred{todasCiudadesDistintas}{ciudades: \TLista{Ciudad}}{
+	\paraTodo[unalinea]{i}{\ent}{enRango(i, ciudades) \implicaLuego \neg \existe[unalinea]{j}{\ent}{(enRango(j, ciudades) \land i \neq j) \yLuego ciudades[i]_0 = ciudades[j]_0}}
+}
+
+\pred{tienenMismosNombres}{ciudades1, ciudades2: \TLista{Ciudad}}{
+	\paraTodo[unalinea]{c1}{Ciudad}{c1 \in ciudades1 \Then \existe[unalinea]{c2}{Ciudad}{c2 \in ciudades2 \land c1_0 = c2_0}}
+}
 
 \section{Demostraciones de correctitud}
 
