@@ -76,10 +76,31 @@ Ciudad:   \ciudad
 \end{proc}
 
 
-\begin{proc}{caminoMínimo}{\In origen:\ent , \In destines: \ent , \In distancias : \TLista{\TLista{\ent}}}{ \TLista{\ent}}
-	\requiere{expresionBooleana1}
-	\asegura{expresionBooleana2}
+\begin{proc}{caminoMínimo}
+  {\In origen:\ent , \In destino: \ent , \In distancias : \TLista{\TLista{\ent}}}
+  {\TLista{\ent}}
+
+  \requiere{
+    origen \neq destino \wedge hayCamino(distancias, origen, destino)
+  }
+
+  \asegura{
+    res = s \Iff \\
+    \existe[unalinea]{s}{\TLista{\ent}}{
+      secuenciaEnMatriz(s, distancias) \yLuego 
+      caminoValido(s, distancias, origen, destino) \implicaLuego \\
+      \paraTodo[unalinea]{s'}{\TLista{\ent}}{
+        (secuenciaEnMatriz(s', distancias) \yLuego 
+         caminoValido(s', distancias, origen, destino))
+        \implicaLuego \\
+        \sum_{i=0}^{|s|-2} distancias[\;s[i]\;][\;s[i+1]\;]
+        \leq 
+        \sum_{i=0}^{|s'|-2} distancias[\;s'[i]\;][\;s'[i+1]\;]
+      }
+    }
+  }
 \end{proc}
+
 
 \subsection{Auxiliares}
 \aux{cantidadHabitantes}{nombre: \str, ciudades: \TLista{Ciudad}}{\ent}{\\
