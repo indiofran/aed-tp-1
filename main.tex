@@ -20,7 +20,7 @@
 \integrante{Gomez Salaverri, Francisco Nicolas}{550/15}{fsalaverri@dc.uba.ar}
 \integrante{Barberón, Federico Joaquín}{112/24}{jfedericobarberonj@gmail.com}
 \integrante{Fuertes Vila, Isabel}{474/92}{isblfv@gmail.com}
-\integrante{Apellido, Nombre4}{004/01}{email4@dominio.com}
+\integrante{Castelli, Tomás Valentín}{094/23}{email4@dominio.com}
 % Pongan cuantos integrantes quieran
 
 % Declaramos donde van a estar las figuras
@@ -39,15 +39,18 @@ A continuación, se presentan los procedimientos solicitados en el enunciado del
 \subsection{Definiciones}
 Las siguientes definiciones se utilizan para proporcionar mayor claridad y legibilidad al trabajo.
 
-Ciudad:   \ciudad
+Ciudad:  \ciudad  \quad siendo $Ciudad_0$ es el nombre de la ciudad y a su vez es el identificador unico de las ciudades, basandonos en el chequeo que realiza la catedra en el punto 2.
 
 
 \subsection{Procedimientos}
 
 
 \begin{proc}{grandesCiudades}{\In ciudades : \TLista{Ciudad}}{ \TLista{Ciudad}}
-	\requiere{|ciudades| \neq 0}
-	\asegura{\paraTodo[unalinea]{i}{\ent}{enRango(i, ciudades) \yLuego ciudades[i][1] > 50000 \implica ciudades[i] = res[i]}}
+	\requiere{todasCiudadesDistintas(ciudades)}
+	\asegura{
+	|res| \leq |ciudades| \land \\
+	\paraTodo[unalinea] {r}{ciudad}{r \in res} \Iff r \in ciudades \land esCiudadGrande(r)
+	}
 \end{proc}
 
 \begin{proc}{sumaDeHabitantes}
@@ -70,9 +73,11 @@ Ciudad:   \ciudad
 	\asegura{res = \True \Iff existeCamino(distancias, desde, hasta)}
 \end{proc}
 
-\begin{proc}{cantidadCaminosNSaltos}{\Inout conexion : \TLista{\TLista{\ent}}, \In n: \ent}{}
-	\requiere{expresionBooleana1}
-	\asegura{expresionBooleana2}
+\begin{proc}{cantidadCaminosNSaltos}{\Inout conexion : \matrizEnt, \In n: \ent}{}
+	\requiere{esMatrizConexion(conexion) \land conexion = C_0 \land n \geq 1 }
+	\asegura{
+	 \existe[unalinea]{s}{\matrizEnt}{|s| = n \yLuego C_0 = s[0] \land conexion = s[|s| -1] \yLuego \\ \paraTodo[unalinea]{i}{\ent}{0\leq i < |s|-1 \implicaLuego esmatrizMultiplo(s[i], s[i+1])} }
+	}
 \end{proc}
 
 
@@ -112,9 +117,13 @@ Ciudad:   \ciudad
 	\paraTodo[unalinea]{i}{\ent}{enRango(i, ciudades) \implicaLuego \neg \existe[unalinea]{j}{\ent}{(enRango(j, ciudades) \land i \neq j) \yLuego ciudades[i]_0 = ciudades[j]_0}}
 }
 
-\pred{tienenMismosNombres}{ciudades1, ciudades2: \TLista{Ciudad}}{
+\pred{tienenMismosNombres}{ciudades1: \TLista{Ciudad}, ciudades2: \TLista{Ciudad}}{
 	\paraTodo[unalinea]{c1}{Ciudad}{c1 \in ciudades1 \Then \existe[unalinea]{c2}{Ciudad}{c2 \in ciudades2 \land c1_0 = c2_0}}
 }
+
+\pred{ciudadesGrandes}{ciudades: \TLista{Ciudad}}{ \paraTodo {c}{ciudad}{ c \in ciudades \implicaLuego esCiudadGrande(c)}}
+
+\pred{esCiudadGrande}{ciudad: ciudad}{ciudad_0 > 50,000} 
 
 \pred{esMatrizCuadrada}{matriz: \matrizEnt}
 {
@@ -138,7 +147,23 @@ camino[0] = desde \land  camino[\longitud{camino} -1] = hasta \land \\
 \paraTodo[unalinea]{i} {\ent} { 0 \leq i < \longitud{camino} - 1 \\  	\implicaLuego distancias \; [\;camino[i]\;] \; [\;camino[i+1]\;] \neq 0}
 }
 
-\pred{enRango}{i: \ent, s: \TLista{\ent}}
+\pred{esMatrizMultiplo}{A: \matrizEnt, B: \matrizEnt}
+{
+|A| = |B| \land esMatrizCuadrada(A) \land esMatrizCuadrada(B) \yLuego \\
+\paraTodo[unalinea]{i}{\ent}{\paraTodo{j}{\ent}{enRango(j,A) \land enRango(i,A) \implicaLuego \\
+ B[i][j] = \sum _{r=0} ^ {|A|-1} A[i][r] * A[r][j]
+}
+}
+}
+
+\pred{esMatrixConexion}{conexion: \matrizEnt}{
+esMatrizCuadrada(conexion) \yLuego \\
+ \paraTodo[unalinea]{i}{\ent}{\paraTodo{j}{\ent}{enRango(i,conexiones) \land \\enRango(j,conexiones)\implicaLuego \\
+ conexiones[i][j] = 1 \lor conexiones[i][j] = 0
+}
+}}
+
+\pred{enRango}{i: \ent, s: \TLista{T}}
 {
 	0 \leq i < \longitud{s}
 }
