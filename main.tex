@@ -3,6 +3,8 @@
 \input{AEDmacros}
 \usepackage{caratula} % Version modificada para usar las macros de algo1 de ~> https://github.com/bcardiff/dc-tex
 \usepackage{dirtytalk}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 % Custom macros
 \newcommand{\ciudad}{\ensuremath{\langle \mathsf{String} , \ent \rangle}}
@@ -178,5 +180,24 @@ En el siguiente apartado, demostraremos la corrección del código solicitado \s
 	50.000 habitantes) y devuelve la cantidad total de habitantes.}
 
 
+\begin{algorithm}
+\caption{Sumar habitantes de ciudades}
+\begin{algorithmic}[1]
+\State $res \gets 0$
+\State $i \gets 0$
+\While{$i < ciudades.length$}
+    \State $res \gets res + ciudades[i].habitantes$
+    \State $i \gets i + 1$
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+Después de verificar la corrección del código anterior, podemos observar que la precondición implica nuestra WP calculada previamente. Esto, a su vez, demuestra, según la definición de precondición:
+
+Definición: Una precondición es una condición sobre los argumentos que el programador asume como verdadera. Especifica lo que la función requiere para llevar a cabo su tarea correctamente.
+
+En este caso, la precondición establece que \paraTodo[unalinea]{i}{\ent}{0 \leq i < |ciudades| \yLuego ciudades[i].habitantes > 50.000}. Esto nos asegura que siempre se devolverá un resultado mayor a 50,000, ya que es un requisito impuesto por la precondición.
+
+Por lo tanto, nuestra implementación, que sigue el procedimiento descrito, suma a res los habitantes de una ciudad. Según la precondición, debe existir al menos una ciudad cuyos habitantes sean más de 50,000. Esto garantiza que el valor de res será mayor a 50,000, ya que siempre existe al menos una ciudad que cumple con dicha condición.
 
 \end{document}
