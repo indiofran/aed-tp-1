@@ -20,88 +20,88 @@
 \newcommand{\Inout}{\textsf{inout }}
 
 \newcommand{\encabezadoDeProc}[4]{%
-	% Ponemos la palabrita problema en tt
-	%  \noindent%
-	{\normalfont\bfseries\ttfamily proc}%
-	% Ponemos el nombre del problema
-	\ %
-	{\normalfont\ttfamily #2}%
-	\
-	% Ponemos los parametros
-	(#3)%
-	\ifthenelse{\equal{#4}{}}{}{%
-		% Por ultimo, va el tipo del resultado
-		\ : #4}
+% Ponemos la palabrita problema en tt
+%  \noindent%
+{\normalfont\bfseries\ttfamily proc}%
+% Ponemos el nombre del problema
+\ %
+{\normalfont\ttfamily #2}%
+\
+% Ponemos los parametros
+(#3)%
+\ifthenelse{\equal{#4}{}}{}{%
+	% Por ultimo, va el tipo del resultado
+	\ : #4}
 }
 
 \newenvironment{proc}[4][res]{%
-	
-	% El parametro 1 (opcional) es el nombre del resultado
-	% El parametro 2 es el nombre del problema
-	% El parametro 3 son los parametros
-	% El parametro 4 es el tipo del resultado
-	% Preambulo del ambiente problema
-	% Tenemos que definir los comandos requiere, asegura, modifica y aux
-	\newcommand{\requiere}[2][]{%
-		{\normalfont\bfseries\ttfamily requiere}%
-		\ifthenelse{\equal{##1}{}}{}{\ {\normalfont\ttfamily ##1} :}\ %
-		\{\ensuremath{##2}\}%
-		{\normalfont\bfseries\,\par}%
-	}
-	\newcommand{\asegura}[2][]{%
-		{\normalfont\bfseries\ttfamily asegura}%
-		\ifthenelse{\equal{##1}{}}{}{\ {\normalfont\ttfamily ##1} :}\
-		\{\ensuremath{##2}\}%
-		{\normalfont\bfseries\,\par}%
-	}
-	\renewcommand{\aux}[4]{%
-		{\normalfont\bfseries\ttfamily aux\ }%
+
+% El parametro 1 (opcional) es el nombre del resultado
+% El parametro 2 es el nombre del problema
+% El parametro 3 son los parametros
+% El parametro 4 es el tipo del resultado
+% Preambulo del ambiente problema
+% Tenemos que definir los comandos requiere, asegura, modifica y aux
+\newcommand{\requiere}[2][]{%
+{\normalfont\bfseries\ttfamily requiere}%
+\ifthenelse{\equal{##1}{}}{}{\ {\normalfont\ttfamily ##1} :}\ %
+\{\ensuremath{##2}\}%
+{\normalfont\bfseries\,\par}%
+}
+\newcommand{\asegura}[2][]{%
+{\normalfont\bfseries\ttfamily asegura}%
+\ifthenelse{\equal{##1}{}}{}{\ {\normalfont\ttfamily ##1} :}\
+\{\ensuremath{##2}\}%
+{\normalfont\bfseries\,\par}%
+}
+\renewcommand{\aux}[4]{%
+	{\normalfont\bfseries\ttfamily aux\ }%
 		{\normalfont\ttfamily ##1}%
-		\ifthenelse{\equal{##2}{}}{}{\ (##2)}\ : ##3\, = \ensuremath{##4}%
-		{\normalfont\bfseries\,;\par}%
-	}
-	\renewcommand{\pred}[3]{%
-		{\normalfont\bfseries\ttfamily pred }%
-		{\normalfont\ttfamily ##1}%
-		\ifthenelse{\equal{##2}{}}{}{\ (##2) }%
-		\{%
-		\begin{adjustwidth}{+5em}{}
-			\ensuremath{##3}
-		\end{adjustwidth}
-		\}%
-		{\normalfont\bfseries\,\par}%
-	}
-	
-	\newcommand{\res}{#1}
-	\vspace{1ex}
-	\noindent
-	\encabezadoDeProc{#1}{#2}{#3}{#4}
-	% Abrimos la llave
-	\par%
-	\tocarEspacios
+	\ifthenelse{\equal{##2}{}}{}{\ (##2)}\ : ##3\, = \ensuremath{##4}%
+	{\normalfont\bfseries\,;\par}%
+}
+\renewcommand{\pred}[3]{%
+{\normalfont\bfseries\ttfamily pred }%
+	{\normalfont\ttfamily ##1}%
+\ifthenelse{\equal{##2}{}}{}{\ (##2) }%
+\{%
+\begin{adjustwidth}{+5em}{}
+	\ensuremath{##3}
+\end{adjustwidth}
+\}%
+{\normalfont\bfseries\,\par}%
+}
+
+\newcommand{\res}{#1}
+\vspace{1ex}
+\noindent
+\encabezadoDeProc{#1}{#2}{#3}{#4}
+% Abrimos la llave
+\par%
+\tocarEspacios
 }
 {
-	% Cerramos la llave
-	\vspace{1ex}
+% Cerramos la llave
+\vspace{1ex}
 }
 
 \newcommand{\aux}[4]{%
 	{\normalfont\bfseries\ttfamily\noindent aux\ }%
-	{\normalfont\ttfamily #1}%
+		{\normalfont\ttfamily #1}%
 	\ifthenelse{\equal{#2}{}}{}{\ (#2)}\ : #3\, = \ensuremath{#4}%
 	{\normalfont\bfseries\,;\par}%
 }
 
 \newcommand{\pred}[3]{%
-	{\normalfont\bfseries\ttfamily\noindent pred }%
+{\normalfont\bfseries\ttfamily\noindent pred }%
 	{\normalfont\ttfamily #1}%
-	\ifthenelse{\equal{#2}{}}{}{\ (#2) }%
-	\{%
-	\begin{adjustwidth}{+2em}{}
-		\ensuremath{#3}
-	\end{adjustwidth}
-	\}%
-	{\normalfont\bfseries\,\par}%
+\ifthenelse{\equal{#2}{}}{}{\ (#2) }%
+\{%
+\begin{adjustwidth}{+2em}{}
+	\ensuremath{#3}
+\end{adjustwidth}
+\}%
+{\normalfont\bfseries\,\par}%
 }
 
 % Tipos
@@ -131,9 +131,9 @@
 			#5
 		}{
 			$ % exiting math mode
-			\begin{adjustwidth}{+2em}{}
-				$#5$%
-			\end{adjustwidth}%
+				\begin{adjustwidth}{+2em}{}
+					$#5$%
+				\end{adjustwidth}%
 			$ % entering math mode
 		}
 		)}
@@ -177,3 +177,11 @@
 	frame=l, framesep=3pt,
 	captionpos=b,
 }
+
+\renewcommand{\wp}[2]{
+	\ensuremath{\textit{wp}(\textbf{\lstinline{#1}}, #2)}
+}
+
+\newcommand{\hoare}[3]{\ensuremath{\{#1\} \; #2 \; \{#3\}}}
+
+\newcommand{\Def}[1]{\text{\normalfont\ttfamily def}(#1)}
