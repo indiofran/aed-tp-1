@@ -88,15 +88,15 @@ Ciudad:  \ciudad \; siendo $Ciudad_0$ el nombre de la ciudad y a su vez es el id
 	{\In origen:\ent , \In destino: \ent , \In distancias : \TLista{\TLista{\ent}}}
 	{\TLista{\ent}}
 
-	\requiere{esMatrizCuadrada(distancias)}
+	\requiere{0 \leq origen, destino < |distancias| \land esMatrizCuadrada(distancias)}
 	\asegura[variaslineas]{
 		\neg existeCamino(distancias, origen, destino) \Then res = \langle \rangle \land \\
-		existeCamino(distancias, origen, destino) \Then secuenciaEnMatriz(res, distancias) \yLuego \\
+		existeCamino(distancias, origen, destino) \Then (secuenciaEnMatriz(res, distancias) \yLuego \\
 		caminoValido(res, distancias, origen, destino) \land \\
 		\paraTodo{c}{\TLista{\ent}}{
 			(secuenciaEnMatriz(c, distancias) \yLuego caminoValido(c, distancias, origen, destino)) \\
 			\implicaLuego distanciaDeCamino(res, distancias) \leq distanciaDeCamino(c, distancias)
-		}
+		})
 	}
 \end{proc}
 
