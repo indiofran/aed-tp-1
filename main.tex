@@ -88,7 +88,7 @@ Ciudad:  \ciudad  \quad siendo $Ciudad_0$ es el nombre de la ciudad y a su vez e
   {\TLista{\ent}}
 
   \requiere{
-    origen \neq destino \wedge hayCamino(distancias, origen, destino)
+    origen \neq destino \\ \wedge existeCamino(distancias, origen, destino)\\ \wedge esMatrizCuadrada(distancias)
   }
 
   \asegura{
@@ -176,6 +176,7 @@ esMatrizCuadrada(conexion) \yLuego \\
 
 \section{Demostraciones de correctitud}
 
+\subsection{Correctiud}
 En el siguiente apartado, demostraremos la corrección del código solicitado \say{poblaciónTotal} en relación con la especificación proporcionada para dicho problema.  \say{La función poblaciónTotal recibe una lista de ciudades donde al menos una de ellas es grande (es decir, supera los
 	50.000 habitantes) y devuelve la cantidad total de habitantes.}
 
@@ -192,6 +193,117 @@ En el siguiente apartado, demostraremos la corrección del código solicitado \s
 \end{algorithmic}
 \end{algorithm}
 
+Para probrar al correctitud de este codigo tiene que cumplir se la tripla de Hoare \hoare {\ensuremath{P}}{S}{\ensuremath{Q}}
+
+Segune el teorema de invariante, si existe un predicado \ensuremath{I} tal que.. \\
+
+1. \ensuremath{P}c \ensuremath{\Longrightarrow} I \\
+2. \hoare {I \wedge B} {S} {I} \\
+3. ($I \wedge  B$) \ensuremath{\Longrightarrow}  \ensuremath{Q}c \\ 
+
+Sea \( P \) la precondición y \( B \) la guarda del bucle `while`.
+
+La relación entre estas condiciones es la siguiente:
+
+\[
+P_c \equiv \{ \text{res} = 0 \land i = 0 \}
+\]
+
+\[
+Q_c \equiv \left\{ \text{res} = \sum_{i=0}^{|\text{ciudades}|-1} \text{ciudades}[i].\text{habitantes} \right\}
+\]
+
+\[
+B \equiv \{ i < |s| \}
+\]
+
+\[
+I \equiv \left\{ 0 \leq i \leq |\text{s}| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes} \right\}
+\]
+
+
+
+Para demostrar que \( P_c \implies I \), verificamos lo siguiente:
+
+1. Demostración de \( 0 \leq i \leq |s| \):
+
+\[
+0 \leq i \leq |s| \equiv 0 \leq 0 \leq |s|
+\]
+
+Esto es cierto ya que \( i = 0 \) en la precondición \( P_c \), y claramente \( 0 \leq |s| \), donde \( |s| \) es la longitud del array de ciudades. Por lo tanto, se cumple \( 0 \leq 0 \leq |s| \).
+
+2. Demostración de la sumatoria en \( I \):
+
+En \( P_c \), tenemos que \( \text{res} = 0 \). La expresión para la sumatoria en \( I \) es:
+
+\[
+\text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}
+\]
+
+Cuando \( i = 0 \), la sumatoria va desde \( j = 0 \) hasta \( j = -1 \), lo cual resulta en una sumatoria vacía:
+
+\[
+\sum_{j=0}^{-1} \text{ciudades}[j].\text{habitantes} = 0
+\]
+
+Por lo tanto, \( \text{res} = 0 \), lo cual coincide con la precondición \( \text{res} = 0 \) en \( P_c \).
+\\
+
+Para demostrar que \hoare{I \land B}{S}{I}  $\ensuremath{\iff I \land B}$: 
+
+Sabemos que \hoare{I \land B}{S}{I}  $\ensuremath{\iff I \land B}$ \implica \wp{S}{I}. Entonces:\\
+
+
+
+$\wp{S}{I} \equiv  \wp{ res := res + ciudades[i].habitantes; i := i + 1}{0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes} $
+
+$\equiv  \wp{ res := res + ciudades[i].habitantes}{\wp{i := i + 1}{0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes}} $
+
+$\equiv  \wp{ res := res + ciudades[i].habitantes}{0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1 + 1} ciudades[j].habitantes} $
+
+$\equiv  \wp{ res := res + ciudades[i].habitantes}{0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes} $
+
+$\equiv  \Def{ciudades[i]} \yLuego -1 \leq i \leq |ciudades| -1 \yLuego res + ciudades[i].habitantes = \sum_{j=0}^{i} ciudades[j].habitantes $
+
+$\equiv  0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes - ciudades[i].habitantes $
+
+$\equiv  0 \leq i \leq |ciudades|  \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes $\\
+
+Entonces $\ensuremath{I \land B}$  \implica \wp{S}{I}? \\
+
+${I \land B}  \equiv  0 \leq i \leq |ciudades|  \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes $
+
+
+Ahora solo queda probar que  $I \land \neg B$
+
+\[
+I \land \neg B \equiv |s| \leq i \leq |s| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}
+\]
+
+\[
+\equiv i = |s| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}
+\]
+
+\[
+\equiv \text{res} = \sum_{j=0}^{|s|-1} \text{ciudades}[j].\text{habitantes} \equiv Q_c
+\]
+
+Donde
+
+\[
+I \land \neg B \equiv |s| \leq i \leq |s| \land \text{res} = \sum_{j=0}^{i-1} s[j]
+\]
+
+\[
+\equiv i = |s| \land \text{res} = \sum_{j=0}^{i-1} s[j]
+\]
+
+\[
+\equiv \text{res} = \sum_{j=0}^{|s|-1} s[j] \equiv Q_c
+\]
+
+\subsection{Correctitud b}
 Después de verificar la corrección del código anterior, podemos observar que la precondición implica nuestra WP calculada previamente. Esto, a su vez, demuestra, según la definición de precondición:
 
 Definición: Una precondición es una condición sobre los argumentos que el programador asume como verdadera. Especifica lo que la función requiere para llevar a cabo su tarea correctamente.
