@@ -43,17 +43,35 @@
 % Preambulo del ambiente problema
 % Tenemos que definir los comandos requiere, asegura, modifica y aux
 \newcommand{\requiere}[2][]{%
-{\normalfont\bfseries\ttfamily requiere}%
-\ifthenelse{\equal{##1}{}}{}{\ {\normalfont\ttfamily ##1} :}\ %
+{\normalfont\bfseries\ttfamily requiere\;}%
+\ifthenelse{\equal{##1}{variaslineas}}{\{%
+\begin{adjustwidth}{+5em}{}
+	\ensuremath{##2}
+\end{adjustwidth}
+\}
+{\normalfont\bfseries\,\par}%
+}
+{%
 \{\ensuremath{##2}\}%
 {\normalfont\bfseries\,\par}%
 }
+}
+
 \newcommand{\asegura}[2][]{%
-{\normalfont\bfseries\ttfamily asegura}%
-\ifthenelse{\equal{##1}{}}{}{\ {\normalfont\ttfamily ##1} :}\
+{\normalfont\bfseries\ttfamily asegura\;}%
+\ifthenelse{\equal{##1}{variaslineas}}{\{%
+\begin{adjustwidth}{+5em}{}
+	\ensuremath{##2}
+\end{adjustwidth}
+\}
+{\normalfont\bfseries\,\par}%
+}
+{%
 \{\ensuremath{##2}\}%
 {\normalfont\bfseries\,\par}%
 }
+}
+
 \renewcommand{\aux}[4]{%
 	{\normalfont\bfseries\ttfamily aux\ }%
 		{\normalfont\ttfamily ##1}%

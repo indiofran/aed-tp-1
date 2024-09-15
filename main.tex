@@ -36,12 +36,12 @@
 \maketitle
 
 \section{Problemas}
-A continuación, se presentan los procedimientos solicitados en el enunciado del trabajo, junto con las definiciones, funciones auxiliares y predicados que forman parte de la especificación del problema 'En búsqueda del camino' de este trabajo práctico.
+A continuación, se presentan los procedimientos solicitados en el enunciado del trabajo, junto con las definiciones, funciones auxiliares y predicados que forman parte de la especificación del problema ``En búsqueda del camino'' de este trabajo práctico.
 
 \subsection{Definiciones}
 Las siguientes definiciones se utilizan para proporcionar mayor claridad y legibilidad al trabajo.
 
-Ciudad:  \ciudad  \quad siendo $Ciudad_0$ es el nombre de la ciudad y a su vez es el identificador unico de las ciudades, basandonos en el chequeo que realiza la catedra en el punto 2.
+Ciudad:  \ciudad \; siendo $Ciudad_0$ el nombre de la ciudad y a su vez es el identificador unico de las ciudades, basandonos en el chequeo que realiza la catedra en el punto 2.
 
 
 \subsection{Procedimientos}
@@ -49,24 +49,24 @@ Ciudad:  \ciudad  \quad siendo $Ciudad_0$ es el nombre de la ciudad y a su vez e
 
 \begin{proc}{grandesCiudades}{\In ciudades : \TLista{Ciudad}}{ \TLista{Ciudad}}
 	\requiere{todasCiudadesDistintas(ciudades)}
-	\asegura{
-	|res| \leq |ciudades| \land \\
-	\paraTodo[unalinea] {r}{ciudad}{r \in res} \Iff r \in ciudades \land esCiudadGrande(r)
+	\asegura[variaslineas]{
+		|res| \leq |ciudades| \land \\
+		\paraTodo[unalinea] {r}{Ciudad}{r \in res \Iff r \in ciudades \land esCiudadGrande(r)}
 	}
 \end{proc}
 
 \begin{proc}{sumaDeHabitantes}
 	{\In menoresDeCiudades : \TLista{Ciudad}, \In mayoresDeCiudades : \TLista{Ciudad}}{ \TLista{Ciudad}}
 
-	\requiere{ \\
+	\requiere[variaslineas]{
 		|menoresDeCiudades| = |mayoresDeCiudades| \land \\
 		todasCiudadesDistintas(menoresDeCiudades) \land \\
-		tienenMismosNombres(menoresDeCiudades, mayoresDeCiudades) \\
+		tienenMismosNombres(menoresDeCiudades, mayoresDeCiudades)
 	}
-	\asegura{\\
+	\asegura[variaslineas]{
 		|res| = |menoresDeCiudades| \land \\
 		tienenMismosNombres(res, menoresDeCiudades) \land \\
-		\paraTodo[unalinea]{c}{Ciudad}{c \in res \Then \\ c_1 = cantidadHabitantes(c_0, menoresDeCiudades) + cantidadHabitantes(c_0, mayoresDeCiudades)} \\
+		\paraTodo[unalinea]{c}{Ciudad}{c \in res \Then \\ c_1 = cantidadHabitantes(c_0, menoresDeCiudades) + cantidadHabitantes(c_0, mayoresDeCiudades)}
 	}
 \end{proc}
 
@@ -77,41 +77,37 @@ Ciudad:  \ciudad  \quad siendo $Ciudad_0$ es el nombre de la ciudad y a su vez e
 
 \begin{proc}{cantidadCaminosNSaltos}{\Inout conexion : \matrizEnt, \In n: \ent}{}
 	\requiere{esMatrizConexion(conexion) \land conexion = C_0 \land n \geq 1 }
-	\asegura{
-	 \existe[unalinea]{s}{\matrizEnt}{|s| = n \yLuego C_0 = s[0] \land conexion = s[|s| -1] \yLuego \\ \paraTodo[unalinea]{i}{\ent}{0\leq i < |s|-1 \implicaLuego esmatrizMultiplo(s[i], s[i+1])} }
+	\asegura[variaslineas]{
+		\existe[unalinea]{s}{\TLista{\matrizEnt}}{|s| = n \yLuego C_0 = s[0] \land conexion = s[|s| -1] \yLuego \\
+			\paraTodo[unalinea]{i}{\ent}{0\leq i < |s|-1 \implicaLuego esMatrizMultiplo(s[i], s[i+1])} }
 	}
 \end{proc}
 
 
 \begin{proc}{caminoMínimo}
-  {\In origen:\ent , \In destino: \ent , \In distancias : \TLista{\TLista{\ent}}}
-  {\TLista{\ent}}
+	{\In origen:\ent , \In destino: \ent , \In distancias : \TLista{\TLista{\ent}}}
+	{\TLista{\ent}}
 
-  \requiere{
-    origen \neq destino \\ \wedge existeCamino(distancias, origen, destino)\\ \wedge esMatrizCuadrada(distancias)
-  }
-
-  \asegura{
-    res = s \Iff \\
-    \existe[unalinea]{s}{\TLista{\ent}}{
-      secuenciaEnMatriz(s, distancias) \yLuego 
-      caminoValido(s, distancias, origen, destino) \implicaLuego \\
-      \paraTodo[unalinea]{s'}{\TLista{\ent}}{
-        (secuenciaEnMatriz(s', distancias) \yLuego 
-         caminoValido(s', distancias, origen, destino))
-        \implicaLuego \\
-        \sum_{i=0}^{|s|-2} distancias[\;s[i]\;][\;s[i+1]\;]
-        \leq 
-        \sum_{i=0}^{|s'|-2} distancias[\;s'[i]\;][\;s'[i+1]\;]
-      }
-    }
-  }
+	\requiere{esMatrizCuadrada(distancias)}
+	\asegura[variaslineas]{
+		\neg existeCamino(distancias, origen, destino) \Then res = \langle \rangle \land \\
+		existeCamino(distancias, origen, destino) \Then secuenciaEnMatriz(res, distancias) \yLuego \\
+		caminoValido(res, distancias, origen, destino) \land \\
+		\paraTodo{c}{\TLista{\ent}}{
+			(secuenciaEnMatriz(c, distancias) \yLuego caminoValido(c, distancias, origen, destino)) \\
+			\implicaLuego distanciaDeCamino(res, distancias) \leq distanciaDeCamino(c, distancias)
+		}
+	}
 \end{proc}
 
 
 \subsection{Auxiliares}
 \aux{cantidadHabitantes}{nombre: \str, ciudades: \TLista{Ciudad}}{\ent}{\\
 	\displaystyle\sum_{i = 0}^{|ciudades| - 1} IfThenElse(ciudades[i]_0 = nombre, ciudades[i]_1, 0)
+}
+
+\aux{distanciaDeCamino}{c: \TLista{\ent}, distancias: \matrizEnt}{\ent}{
+\displaystyle\sum_{i=0}^{|c| - 2} distancias[\;c[i]\;][\;c[i + 1]\;]
 }
 
 \subsection{Predicados}
@@ -123,13 +119,11 @@ Ciudad:  \ciudad  \quad siendo $Ciudad_0$ es el nombre de la ciudad y a su vez e
 	\paraTodo[unalinea]{c1}{Ciudad}{c1 \in ciudades1 \Then \existe[unalinea]{c2}{Ciudad}{c2 \in ciudades2 \land c1_0 = c2_0}}
 }
 
-\pred{ciudadesGrandes}{ciudades: \TLista{Ciudad}}{ \paraTodo {c}{ciudad}{ c \in ciudades \implicaLuego esCiudadGrande(c)}}
-
-\pred{esCiudadGrande}{ciudad: ciudad}{ciudad_0 > 50,000} 
+\pred{esCiudadGrande}{ciudad: Ciudad}{ciudad_1 > 50,000}
 
 \pred{esMatrizCuadrada}{matriz: \matrizEnt}
 {
-	\paraTodo[unalinea]{i}{\ent}{0 \leq i < |matriz| \implicaLuego \longitud{matriz[i]} = \longitud{matriz}}
+	\paraTodo[unalinea]{i}{\ent}{enRango(i, matriz) \implicaLuego \longitud{matriz[i]} = \longitud{matriz}}
 }
 \pred{existeCamino}{distancias: \matrizEnt, desde: \ent, hasta: \ent} {
 	\existe {s} {\TLista{\ent}} {
@@ -137,7 +131,7 @@ Ciudad:  \ciudad  \quad siendo $Ciudad_0$ es el nombre de la ciudad y a su vez e
 	}
 }
 \pred{secuenciaEnMatriz}{secuencia: \TLista{\ent}, matriz: \matrizEnt} {
-	\paraTodo {i} {\ent}{enRango(i,secuencia) \implicaLuego 0 \leq secuencia[i] < \longitud{matriz}}
+	\paraTodo {i} {\ent}{enRango(i,secuencia) \implicaLuego enRango(secuencia[i], matriz)}
 }
 
 
@@ -146,24 +140,24 @@ Ciudad:  \ciudad  \quad siendo $Ciudad_0$ es el nombre de la ciudad y a su vez e
 {
 \longitud{camino} \geq 2 \yLuego \\
 camino[0] = desde \land  camino[\longitud{camino} -1] = hasta \land \\
-\paraTodo[unalinea]{i} {\ent} { 0 \leq i < \longitud{camino} - 1 \\  	\implicaLuego distancias \; [\;camino[i]\;] \; [\;camino[i+1]\;] \neq 0}
+\paraTodo{i} {\ent} { 0 \leq i < \longitud{camino} - 1  	\implicaLuego distancias \; [\;camino[i]\;] \; [\;camino[i+1]\;] \neq 0}
 }
 
 \pred{esMatrizMultiplo}{A: \matrizEnt, B: \matrizEnt}
 {
-|A| = |B| \land esMatrizCuadrada(A) \land esMatrizCuadrada(B) \yLuego \\
-\paraTodo[unalinea]{i}{\ent}{\paraTodo{j}{\ent}{enRango(j,A) \land enRango(i,A) \implicaLuego \\
- B[i][j] = \sum _{r=0} ^ {|A|-1} A[i][r] * A[r][j]
-}
-}
+	|A| = |B| \land esMatrizCuadrada(A) \land esMatrizCuadrada(B) \yLuego \\
+	\paraTodo[unalinea]{i}{\ent}{\paraTodo{j}{\ent}{enRango(j,A) \land enRango(i,A) \implicaLuego \\
+			B[i][j] = \sum _{r=0} ^ {|A|-1} A[i][r] * A[r][j]
+		}
+	}
 }
 
 \pred{esMatrixConexion}{conexion: \matrizEnt}{
-esMatrizCuadrada(conexion) \yLuego \\
- \paraTodo[unalinea]{i}{\ent}{\paraTodo{j}{\ent}{enRango(i,conexiones) \land \\enRango(j,conexiones)\implicaLuego \\
- conexiones[i][j] = 1 \lor conexiones[i][j] = 0
-}
-}}
+	esMatrizCuadrada(conexion) \yLuego \\
+	\paraTodo[unalinea]{i}{\ent}{\paraTodo{j}{\ent}{enRango(i,conexiones) \land \\enRango(j,conexiones)\implicaLuego \\
+			conexiones[i][j] = 1 \lor conexiones[i][j] = 0
+		}
+	}}
 
 \pred{enRango}{i: \ent, s: \TLista{T}}
 {
@@ -177,139 +171,176 @@ esMatrizCuadrada(conexion) \yLuego \\
 \section{Demostraciones de correctitud}
 
 \subsection{Correctiud}
-En el siguiente apartado, demostraremos la corrección del código solicitado \say{poblaciónTotal} en relación con la especificación proporcionada para dicho problema.  \say{La función poblaciónTotal recibe una lista de ciudades donde al menos una de ellas es grande (es decir, supera los
-	50.000 habitantes) y devuelve la cantidad total de habitantes.}
+En el siguiente apartado, demostraremos la corrección del código solicitado \say{poblaciónTotal} en relación con la especificación proporcionada para dicho problema.  \say{La función poblaciónTotal recibe una lista de ciudades donde al menos una de ellas es grande (es decir, supera los 50.000 habitantes) y devuelve la cantidad total de habitantes.}
 
+\begin{lstlisting}
+res := 0;
+i := 0;
+while (i < |ciudades|) do
+	res := res + ciudades[i].habitantes;
+	i := i + 1
+endwhile
+\end{lstlisting}
 
-\begin{algorithm}
-\caption{Sumar habitantes de ciudades}
-\begin{algorithmic}[1]
-\State $res \gets 0$
-\State $i \gets 0$
-\While{$i < ciudades.length$}
-    \State $res \gets res + ciudades[i].habitantes$
-    \State $i \gets i + 1$
-\EndWhile
-\end{algorithmic}
-\end{algorithm}
+% \begin{algorithm}
+% 	\caption{Sumar habitantes de ciudades}
+% 	\begin{algorithmic}[1]
+% 		\State $res \gets 0$
+% 		\State $i \gets 0$
+% 		\While{$i < ciudades.length$}
+% 		\State $res \gets res + ciudades[i].habitantes$
+% 		\State $i \gets i + 1$
+% 		\EndWhile
+% 	\end{algorithmic}
+% \end{algorithm}
 
-Para probrar al correctitud de este codigo tiene que cumplir se la tripla de Hoare \hoare {\ensuremath{P}}{S}{\ensuremath{Q}}
+Para probrar al correctitud de este codigo tiene que cumplirse la tripla de Hoare \hoare {P}{S}{Q}
 
-Segune el teorema de invariante, si existe un predicado \ensuremath{I} tal que.. \\
+Según el teorema de invariante, si existe un predicado $I$ tal que.. \par
 
-1. \ensuremath{P}c \ensuremath{\Longrightarrow} I \\
-2. \hoare {I \wedge B} {S} {I} \\
-3. ($I \wedge  B$) \ensuremath{\Longrightarrow}  \ensuremath{Q}c \\ 
+\begin{enumerate}
+	\item $P_c \Longrightarrow I$
+	\item \hoare {I \wedge B} {S} {I}
+	\item $(I \wedge  \neg B) \Longrightarrow Q_c$
+\end{enumerate}
 
 Sea \( P \) la precondición y \( B \) la guarda del bucle `while`.
 
 La relación entre estas condiciones es la siguiente:
 
-\[
-P_c \equiv \{ \text{res} = 0 \land i = 0 \}
-\]
-
-\[
-Q_c \equiv \left\{ \text{res} = \sum_{i=0}^{|\text{ciudades}|-1} \text{ciudades}[i].\text{habitantes} \right\}
-\]
-
-\[
-B \equiv \{ i < |s| \}
-\]
-
-\[
-I \equiv \left\{ 0 \leq i \leq |\text{s}| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes} \right\}
-\]
-
-
+\begin{align*}
+	P_c & \equiv \{ \text{res} = 0 \land i = 0 \}                                                                                   \\
+	Q_c & \equiv \left\{ \text{res} = \sum_{i=0}^{|\text{ciudades}|-1} \text{ciudades}[i].\text{habitantes} \right\}                \\
+	B   & \equiv \{ i < |ciudades| \}                                                                                               \\
+	I   & \equiv \left\{ 0 \leq i \leq |\text{s}| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes} \right\} \\
+	f_v & \equiv \left\{ |ciudades| - i \right\}
+\end{align*}
 
 Para demostrar que \( P_c \implies I \), verificamos lo siguiente:
 
-1. Demostración de \( 0 \leq i \leq |s| \):
+\begin{enumerate}
+	\item Demostración de \( 0 \leq i \leq |s| \):
 
-\[
-0 \leq i \leq |s| \equiv 0 \leq 0 \leq |s|
-\]
+	      \[
+		      0 \leq i \leq |s| \equiv 0 \leq 0 \leq |s|
+	      \]
 
-Esto es cierto ya que \( i = 0 \) en la precondición \( P_c \), y claramente \( 0 \leq |s| \), donde \( |s| \) es la longitud del array de ciudades. Por lo tanto, se cumple \( 0 \leq 0 \leq |s| \).
+	      Esto es cierto ya que \( i = 0 \) en la precondición \( P_c \), y claramente \( 0 \leq |s| \), donde \( |s| \) es la longitud del array de ciudades. Por lo tanto, se cumple \( 0 \leq 0 \leq |s| \).
 
-2. Demostración de la sumatoria en \( I \):
+	\item Demostración de la sumatoria en \( I \):
 
-En \( P_c \), tenemos que \( \text{res} = 0 \). La expresión para la sumatoria en \( I \) es:
+	      En \( P_c \), tenemos que \( \text{res} = 0 \). La expresión para la sumatoria en \( I \) es:
 
-\[
-\text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}
-\]
+	      \[
+		      \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}
+	      \]
 
-Cuando \( i = 0 \), la sumatoria va desde \( j = 0 \) hasta \( j = -1 \), lo cual resulta en una sumatoria vacía:
+	      Cuando \( i = 0 \), la sumatoria va desde \( j = 0 \) hasta \( j = -1 \), lo cual resulta en una sumatoria vacía:
 
-\[
-\sum_{j=0}^{-1} \text{ciudades}[j].\text{habitantes} = 0
-\]
+	      \[
+		      \sum_{j=0}^{-1} \text{ciudades}[j].\text{habitantes} = 0
+	      \]
 
-Por lo tanto, \( \text{res} = 0 \), lo cual coincide con la precondición \( \text{res} = 0 \) en \( P_c \).
-\\
+	      Por lo tanto, \( \text{res} = 0 \), lo cual coincide con la precondición \( \text{res} = 0 \) en \( P_c \).
+\end{enumerate}
 
-Para demostrar que \hoare{I \land B}{S}{I}  $\ensuremath{\iff I \land B}$: 
+Para demostrar que \hoare{I \land B}{S}{I}:
 
-Sabemos que \hoare{I \land B}{S}{I}  $\ensuremath{\iff I \land B}$ \implica \wp{S}{I}. Entonces:\\
+Sabemos que $\hoare{I \land B}{S}{I} \iff (I \land B) \implica \wp{S}{I}$. Entonces:
 
-
-
-$\wp{S}{I} \equiv  \wp{ res := res + ciudades[i].habitantes; i := i + 1}{0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes} $
-
-$\equiv  \wp{ res := res + ciudades[i].habitantes}{\wp{i := i + 1}{0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes}} $
-
-$\equiv  \wp{ res := res + ciudades[i].habitantes}{0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1 + 1} ciudades[j].habitantes} $
-
-$\equiv  \wp{ res := res + ciudades[i].habitantes}{0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes} $
-
-$\equiv  \Def{ciudades[i]} \yLuego -1 \leq i \leq |ciudades| -1 \yLuego res + ciudades[i].habitantes = \sum_{j=0}^{i} ciudades[j].habitantes $
-
-$\equiv  0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes - ciudades[i].habitantes $
-
-$\equiv  0 \leq i \leq |ciudades|  \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes $\\
-
-Entonces $\ensuremath{I \land B}$  \implica \wp{S}{I}? \\
-
-${I \land B}  \equiv  0 \leq i \leq |ciudades|  \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes $
+\begin{align*}
+	\wp{S}{I} & \equiv  \wp{ res := res + ciudades[i].habitantes; i := i + 1}{0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes}      \\
+	          & \equiv  \wp{ res := res + ciudades[i].habitantes}{\wp{i := i + 1}{0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes}} \\
+	          & \equiv  \wp{ res := res + ciudades[i].habitantes}{0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1 + 1} ciudades[j].habitantes}            \\
+	          & \equiv  \wp{ res := res + ciudades[i].habitantes}{0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes}                  \\
+	          & \equiv  \Def{ciudades[i]} \yLuego -1 \leq i \leq |ciudades| -1 \yLuego res + ciudades[i].habitantes = \sum_{j=0}^{i} ciudades[j].habitantes        \\
+	          & \equiv  0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes - ciudades[i].habitantes                                      \\
+	          & \equiv  0 \leq i \leq |ciudades|  \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes
+\end{align*}
 
 
-Ahora solo queda probar que  $I \land \neg B$
+Entonces $\ensuremath{I \land B}$  \implica \wp{S}{I}?
 
-\[
-I \land \neg B \equiv |s| \leq i \leq |s| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}
-\]
+\[{I \land B}  \equiv  0 \leq i \leq |ciudades|  \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes \]
 
-\[
-\equiv i = |s| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}
-\]
+Que es exactamente \wp{S}{I}.
+\bigskip
 
-\[
-\equiv \text{res} = \sum_{j=0}^{|s|-1} \text{ciudades}[j].\text{habitantes} \equiv Q_c
-\]
+Ahora solo queda probar que  $(I \land \neg B) \Then Q_c$
 
 Donde
+\begin{align*}
+	I \land \neg B & \equiv |s| \leq i \leq |s| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes} \\
+	               & \equiv i = |s| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}             \\
+	               & \equiv \text{res} = \sum_{j=0}^{|s|-1} \text{ciudades}[j].\text{habitantes} \equiv Q_c              \\
+\end{align*}
 
-\[
-I \land \neg B \equiv |s| \leq i \leq |s| \land \text{res} = \sum_{j=0}^{i-1} s[j]
-\]
+De esta manera, queda demostrado que el programa es parcialmente correcto. Ahora solo queda demostrar que el programa efectivamente termina, en particular, que el ciclo termina en una cantidad finita de iteraciones. Esto se demuestra mediante el teorema de terminación.
+\bigskip
 
-\[
-\equiv i = |s| \land \text{res} = \sum_{j=0}^{i-1} s[j]
-\]
+Según este teorema, si existe una función $f_v: \mathds{V} \to \ent$ tal que:
 
-\[
-\equiv \text{res} = \sum_{j=0}^{|s|-1} s[j] \equiv Q_c
-\]
+\begin{enumerate}
+	\item \hoare{I \land B \land f_v = v_0}{S}{f_v < v_0}
+	\item $(I \land f_v \leq 0) \Then \neg B$
+\end{enumerate}
+
+entonces la ejecución del ciclo \lstinline|while B do S endwhile| siempre termina.
+\bigskip
+
+Por lo cual, probamos si la función variante propuesta $f_v = |ciudades| - i$ cumple estas condiciones.
+\bigskip
+
+\begin{enumerate}
+	\item \hoare{I \land B \land f_v = v_0}{S}{f_v < v_0}
+
+	      Sabemos que $\hoare{I \land B \land f_v = v_0}{S}{f_v < v_0} \iff (i \land B \land f_v = v_0) \Then \wp{S}{f_v < v_0}$, entonces:
+
+	      \begin{align*}
+		      \wp{S}{f_v < v_0} & \equiv \wp{res := res + ciudades[i].habitantes; i := i + 1;}{|ciudades| - i < v_0} \\
+		                        & \equiv \wp{res := res + ciudades[i].habitantes}{\wp{i := i + 1}{f_v < v_0}}        \\
+		                        & \equiv \wp{res := res + ciudades[i].habitantes}{|ciudades| - i - 1 < v_0}          \\
+		                        & \equiv 0 \leq i < |ciduades| \land |ciudades| - i - 1 < v_0
+	      \end{align*}
+
+	      Por lo tanto,
+	      \begin{align*}
+		       & (I \land B \land f_v = v_0) \Then \wp{S}{f_v < v_0}                                                                                                                                                                          \\
+		       & \equiv ((0 \leq i < |ciudades| \yLuego \underbrace{res = \sum_{j = 0}^{i - 1} ciudades[j].habitantes}_{\text{No me aporta nada en la implicación}}) \land i < |ciudades| \land |ciudades| - i = v_0) \Then \wp{S}{f_v < v_0} \\
+		       & \equiv (0 \leq i < |ciuades| \land |ciudades| - i = v_0) \Then (0 \leq i < |ciduades| \land |ciudades| - i - 1 < v_0)                                                                                                        \\
+		       & \equiv |ciudades| - i = v_0 \Then |ciudades| - i - 1 < v_0                                                                                                                                                                   \\
+		       & \equiv |ciudades| - i - 1 < |ciudades| - i                                                                                                                                                                                   \\
+		       & \equiv -1 < 0 \equiv True
+	      \end{align*}
+
+	\item $(I \land f_v \leq 0) \Then \neg B$
+
+	      Tenemos que
+	      \begin{align*}
+		      (I \land f_v \leq 0) \Then \neg B & \equiv ((0 \leq i \leq |ciudades| \yLuego \underbrace{res = \sum_{j = 0}^{i - 1} ciudades[j].habitantes}_{\text{No me aporta nada en la implicación}}) \land |ciudades| - i \leq 0) \Then i \geq |ciudades| \\
+		                                        & \equiv (0 \leq i \leq |ciudades| \land |ciudades| \leq i) \Then i \geq |ciduades|                                                                                                                           \\
+		                                        & \equiv i = |ciudades| \Then i \geq |ciudades|                                                                                                                                                               \\
+		                                        & \equiv |ciudades| \geq |ciudades| \equiv True
+	      \end{align*}
+\end{enumerate}
+
+De esta manera, queda demostrado que el ciclo termina en una cantidad finita de iteraciones, por lo que así, en conjunto con lo probado anteriormente, queda demostrado que la implementación es \textbf{correcta} con respecto a la especificación.
 
 \subsection{Correctitud b}
 Después de verificar la corrección del código anterior, podemos observar que la precondición implica nuestra WP calculada previamente. Esto, a su vez, demuestra, según la definición de precondición:
+\medskip
 
-Definición: Una precondición es una condición sobre los argumentos que el programador asume como verdadera. Especifica lo que la función requiere para llevar a cabo su tarea correctamente.
+Definición: \textit{Una precondición es una condición sobre los argumentos que el programador asume como verdadera. Especifica lo que la función requiere para llevar a cabo su tarea correctamente.}
+\medskip
 
-En este caso, la precondición establece que \paraTodo[unalinea]{i}{\ent}{0 \leq i < |ciudades| \yLuego ciudades[i].habitantes > 50.000}. Esto nos asegura que siempre se devolverá un resultado mayor a 50,000, ya que es un requisito impuesto por la precondición.
+En este caso, la precondición establece que
+\begin{align*}
+	 & \existe[unalinea]{i}{\ent}{0 \leq i < |ciudades| \yLuego ciudades[i].habitantes > 50.000} \land \\
+	 & \paraTodo[unalinea]{i}{\ent}{0 \leq i < |ciudades| \implicaLuego ciudades[i].habitantes \geq 0}
+\end{align*}
+Esto nos asegura que siempre se devolverá un resultado mayor a 50,000, ya que es un requisito impuesto por la precondición.
+\medskip
 
-Por lo tanto, nuestra implementación, que sigue el procedimiento descrito, suma a res los habitantes de una ciudad. Según la precondición, debe existir al menos una ciudad cuyos habitantes sean más de 50,000. Esto garantiza que el valor de res será mayor a 50,000, ya que siempre existe al menos una ciudad que cumple con dicha condición.
+Por lo tanto, nuestra implementación, que sigue el procedimiento descrito, suma a res los habitantes de una ciudad. Según la precondición, debe existir al menos una ciudad cuyos habitantes sean más de 50,000 y todas deben tener una cantidad positiva de habitantes. Esto garantiza que el valor de res será mayor a 50,000, ya que siempre existe al menos una ciudad que cumple con dicha condición.
 
 \end{document}
