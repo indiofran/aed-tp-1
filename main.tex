@@ -40,9 +40,12 @@ A continuación, se presentan los procedimientos solicitados en el enunciado del
 
 \subsection{Definiciones}
 Las siguientes definiciones se utilizan para proporcionar mayor claridad y legibilidad al trabajo.
+\medskip
 
 Ciudad:  \ciudad \; siendo $Ciudad_0$ el nombre de la ciudad y a su vez es el identificador unico de las ciudades, basandonos en el chequeo que realiza la catedra en el punto 2.
+\medskip
 
+Consideramos como ``caminos válidos'' aquellos que conectan dos o más ciudades distintas, siempre y cuando exista una conexión real entre ellas. Por lo tanto, un camino como $\langle A \rangle$ no es válido, ya que no implica un desplazamiento entre ciudades, tal y como fue aclarado por la catedra. Sin embargo, un camino como $\langle A, B, A \rangle$, donde $A$ y $B$ están conectados, lo consideramos como válido dado que involucra un recorrido efectivo hacia una ciudad diferente $(B)$ antes de regresar a la ciudad inicial $(A)$. En resumen, cualquier camino que implique al menos una conexión entre ciudades distintas y en el que dichas ciudades estén conectadas es considerado válido, incluso si eventualmente regresa al punto de partida.
 
 \subsection{Procedimientos}
 
