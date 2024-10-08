@@ -74,24 +74,37 @@ Consideramos como ``caminos válidos'' aquellos que conectan dos o más ciudades
 \end{proc}
 
 \begin{proc}{hayCamino}{\In distancias : \matrizEnt, in desde: \ent, hasta: \ent}{ \bool}
-	\requiere{ 0 \leq desde,hasta < \longitud{distancias} \wedge esMatrizCuadrada(distancias)}
-	\asegura{res = \True \Iff existeCamino(distancias, desde, hasta)}
+	\requiere[variaslineas]{
+		0 \leq desde,hasta < \longitud{distancias} \land \\
+		esSimetrica(m) \land \\
+		tieneDiagonalNula(m) \land \\
+		todosPositivos(m)
+	}
+	\asegura{res = existeCamino(distancias, desde, hasta)}
 \end{proc}
 
 \begin{proc}{cantidadCaminosNSaltos}{\Inout conexion : \matrizEnt, \In n: \ent}{}
-	\requiere{esMatrizConexion(conexion) \land conexion = C_0 \land n \geq 1 }
+	\requiere{
+		esMatrizConexion(conexion) \land n \geq 1 \land conexion = C_0
+	}
 	\asegura[variaslineas]{
 		\existe[unalinea]{s}{\TLista{\matrizEnt}}{|s| = n \yLuego C_0 = s[0] \land conexion = s[|s| -1] \yLuego \\
-			\paraTodo[unalinea]{i}{\ent}{0\leq i < |s|-1 \implicaLuego esMatrizMultiplo(s[i], s[i+1])} }
+			\paraTodo[unalinea]{i}{\ent}{1\leq i < |s| \implicaLuego esProductoDeMatriz(s[i], s[i-1], s[0])} }
 	}
 \end{proc}
 
+\pagebreak
 
 \begin{proc}{caminoMínimo}
 	{\In origen:\ent , \In destino: \ent , \In distancias : \TLista{\TLista{\ent}}}
 	{\TLista{\ent}}
 
-	\requiere{0 \leq origen, destino < |distancias| \land esMatrizCuadrada(distancias)}
+	\requiere[variaslineas]{
+		0 \leq desde,hasta < \longitud{distancias} \land \\
+		esSimetrica(m) \land \\
+		tieneDiagonalNula(m) \land \\
+		todosPositivos(m)
+	}
 	\asegura[variaslineas]{
 		\neg existeCamino(distancias, origen, destino) \Then res = \langle \rangle \land \\
 		existeCamino(distancias, origen, destino) \Then (secuenciaEnMatriz(res, distancias) \yLuego \\
@@ -128,6 +141,28 @@ Consideramos como ``caminos válidos'' aquellos que conectan dos o más ciudades
 {
 	\paraTodo[unalinea]{i}{\ent}{enRango(i, matriz) \implicaLuego \longitud{matriz[i]} = \longitud{matriz}}
 }
+
+\pred{esSimetrica}{m: \matrizEnt}{
+	esMatrizCuadrada(m) \yLuego \\
+	\paraTodo[unalinea]{i}{\ent}{
+		\paraTodo[unalinea]{j}{\ent}{
+			(enRango(i,m) \land enRango(j,m)) \implicaLuego s[i][j] = s[j][i]
+		}
+	}
+}
+
+\pred{todosPositivos}{m: \matrizEnt}{
+\paraTodo[unalinea]{i}{\ent}{
+\paraTodo[unalinea]{j}{\ent}{
+(enRango(i,m) \land enRango(j,m[i])) \implicaLuego s[i][j] \geq 0
+}
+}
+}
+
+\pred{tieneDiagonalNula}{m: \matrizEnt}{
+	\paraTodo{i}{\ent}{enRango(i,m) \implicaLuego m[i][i] = 0}
+}
+
 \pred{existeCamino}{distancias: \matrizEnt, desde: \ent, hasta: \ent} {
 	\existe {s} {\TLista{\ent}} {
 		secuenciaEnMatriz(s, distancias)  \yLuego caminoValido(s,distancias, desde, hasta)
@@ -146,17 +181,18 @@ camino[0] = desde \land  camino[\longitud{camino} -1] = hasta \land \\
 \paraTodo{i} {\ent} { 0 \leq i < \longitud{camino} - 1  	\implicaLuego distancias \; [\;camino[i]\;] \; [\;camino[i+1]\;] \neq 0}
 }
 
-\pred{esMatrizMultiplo}{A: \matrizEnt, B: \matrizEnt}
+\pred{esProductoDeMatriz}{A: \matrizEnt, M1: \matrizEnt, M2: \matrizEnt}
 {
-	|A| = |B| \land esMatrizCuadrada(A) \land esMatrizCuadrada(B) \yLuego \\
+	|A| = |M1| \land |M1| = |M2| \land \\
+	esMatrizCuadrada(A) \land esMatrizCuadrada(M1) \land esMatrizCuadrada(M2) \yLuego \\
 	\paraTodo[unalinea]{i}{\ent}{\paraTodo{j}{\ent}{enRango(j,A) \land enRango(i,A) \implicaLuego \\
-			B[i][j] = \sum _{r=0} ^ {|A|-1} A[i][r] * A[r][j]
+			A[i][j] = \sum _{r=0} ^ {|A|-1} M1[i][r] * M2[r][j]
 		}
 	}
 }
 
 \pred{esMatrixConexion}{conexion: \matrizEnt}{
-	esMatrizCuadrada(conexion) \yLuego \\
+	(esSimetrica(conexion) \land tieneDiagonalNula(conexion)) \yLuego \\
 	\paraTodo[unalinea]{i}{\ent}{\paraTodo{j}{\ent}{enRango(i,conexiones) \land \\enRango(j,conexiones)\implicaLuego \\
 			conexiones[i][j] = 1 \lor conexiones[i][j] = 0
 		}
