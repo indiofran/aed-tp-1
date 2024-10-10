@@ -233,23 +233,49 @@ endwhile
 % 	\end{algorithmic}
 % \end{algorithm}
 
-Para probrar al correctitud de este codigo tiene que cumplirse la tripla de Hoare \hoare {P}{S}{Q}
+Para probrar al correctitud de este codigo tiene que cumplirse la tripla de Hoare \hoare {P}{S}{Q}, que se prueba mostrando que $P \Then \wp{S}{Q}$
+
+Para esto, podemos pensar al programa $S$ como una sucesión de programas $S1;S2$:
+%
+\begin{align*}
+	S1 & \equiv \lstinline|res := 0; i := 0| \\
+	S2 & \equiv \lstinline|ciclo|
+\end{align*}
+
+De esta manera, si probamos que
+
+\begin{itemize}
+	\item $P \Then \wp{S1}{Pc}$
+	\item $Pc \Then \wp{S2}{Q}$
+\end{itemize}
+
+entonces, por corolario de monotonía, $P \Then \wp{S}{Q}$, es decir, el programa es correcto.
+\bigskip
+
+{\large$Pc \Then \wp{S2}{Q}$}
+\medskip
+
+Como $S2$ es un ciclo, no tenemos un axioma que nos permita calcular la \wp{S2}{Q}, sin embargo, podemos probar que la tripla de Hoare \hoare{Pc}{S2}{Q} es correcto mediante el teorema del invariante y el teorema de terminación.
+\pagebreak
 
 Según el teorema de invariante, si existe un predicado $I$ tal que.. \par
 
 \begin{enumerate}
 	\item $P_c \Longrightarrow I$
-	\item \hoare {I \wedge B} {S} {I}
-	\item $(I \wedge  \neg B) \Longrightarrow Q_c$
+	\item \hoare {I \wedge B} {S2} {I}
+	\item $(I \wedge  \neg B) \Longrightarrow Q$
 \end{enumerate}
 
-Sea \( P \) la precondición y \( B \) la guarda del bucle `while`.
+Entonces el programa $S2$ es parcialmente correcto con respecto a la especificación.
+\bigskip
+
+Sea \( Q\) la poscondición y \( B \) la guarda del bucle `while`.
 
 La relación entre estas condiciones es la siguiente:
-
+%
 \begin{align*}
 	P_c & \equiv \{ \text{res} = 0 \land i = 0 \}                                                                                   \\
-	Q_c & \equiv \left\{ \text{res} = \sum_{i=0}^{|\text{ciudades}|-1} \text{ciudades}[i].\text{habitantes} \right\}                \\
+	Q   & \equiv \left\{ \text{res} = \sum_{i=0}^{|\text{ciudades}|-1} \text{ciudades}[i].\text{habitantes} \right\}                \\
 	B   & \equiv \{ i < |ciudades| \}                                                                                               \\
 	I   & \equiv \left\{ 0 \leq i \leq |\text{s}| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes} \right\} \\
 	f_v & \equiv \left\{ |ciudades| - i \right\}
@@ -259,12 +285,13 @@ Para demostrar que \( P_c \implies I \), verificamos lo siguiente:
 
 \begin{enumerate}
 	\item Demostración de \( 0 \leq i \leq |s| \):
-
+	\item
+	      Asumiendo que vale el antecedente, se tiene que
 	      \[
-		      0 \leq i \leq |s| \equiv 0 \leq 0 \leq |s|
+		      i = 0 \land 0 \leq i \leq |s| \equiv 0 \leq 0 \leq |s|
 	      \]
 
-	      Esto es cierto ya que \( i = 0 \) en la precondición \( P_c \), y claramente \( 0 \leq |s| \), donde \( |s| \) es la longitud del array de ciudades. Por lo tanto, se cumple \( 0 \leq 0 \leq |s| \).
+	      Esto es cierto ya que claramente \( 0 \leq |s| \), donde \( |s| \) es la longitud del array de ciudades. Por lo tanto, se cumple \( 0 \leq 0 \leq |s| \).
 
 	\item Demostración de la sumatoria en \( I \):
 
@@ -282,37 +309,42 @@ Para demostrar que \( P_c \implies I \), verificamos lo siguiente:
 
 	      Por lo tanto, \( \text{res} = 0 \), lo cual coincide con la precondición \( \text{res} = 0 \) en \( P_c \).
 \end{enumerate}
+\pagebreak
 
-Para demostrar que \hoare{I \land B}{S}{I}:
+Para demostrar que \hoare{I \land B}{S2}{I}:
 
-Sabemos que $\hoare{I \land B}{S}{I} \iff (I \land B) \implica \wp{S}{I}$. Entonces:
+Sabemos que $\hoare{I \land B}{S2}{I} \iff (I \land B) \implica \wp{S2}{I}$. Entonces:
 
 \begin{align*}
-	\wp{S}{I} & \equiv  \wp{ res := res + ciudades[i].habitantes; i := i + 1}{0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes}      \\
-	          & \equiv  \wp{ res := res + ciudades[i].habitantes}{\wp{i := i + 1}{0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes}} \\
-	          & \equiv  \wp{ res := res + ciudades[i].habitantes}{0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1 + 1} ciudades[j].habitantes}            \\
-	          & \equiv  \wp{ res := res + ciudades[i].habitantes}{0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes}                  \\
-	          & \equiv  \Def{ciudades[i]} \yLuego -1 \leq i \leq |ciudades| -1 \yLuego res + ciudades[i].habitantes = \sum_{j=0}^{i} ciudades[j].habitantes        \\
-	          & \equiv  0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes - ciudades[i].habitantes                                      \\
-	          & \equiv  0 \leq i \leq |ciudades|  \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes
+	\wp{S2}{I} & \equiv  \wp{ res := res + ciudades[i].habitantes; i := i + 1}{0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes}      \\
+	           & \equiv  \wp{ res := res + ciudades[i].habitantes}{\wp{i := i + 1}{0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes}} \\
+	           & \equiv  \wp{ res := res + ciudades[i].habitantes}{0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1 + 1} ciudades[j].habitantes}            \\
+	           & \equiv  \wp{ res := res + ciudades[i].habitantes}{0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes}                  \\
+	           & \equiv  \Def{ciudades[i]} \yLuego -1 \leq i \leq |ciudades| -1 \yLuego res + ciudades[i].habitantes = \sum_{j=0}^{i} ciudades[j].habitantes        \\
+	           & \equiv  0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes - ciudades[i].habitantes                                      \\
+	           & \equiv  0 \leq i \leq |ciudades|  \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes
 \end{align*}
 
 
-Entonces $\ensuremath{I \land B}$  \implica \wp{S}{I}?
+Entonces $\ensuremath{I \land B}$  \implica \wp{S2}{I}?
 
 \[{I \land B}  \equiv  0 \leq i \leq |ciudades|  \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes \]
 
-Que es exactamente \wp{S}{I}.
+Que es exactamente \wp{S2}{I}, y por lo tanto $I \land B \Then\wp{S2}{I} \equiv \wp{S2}{I} \Then \wp{S2}{I} \equiv True$ QED.
+
 \bigskip
 
-Ahora solo queda probar que  $(I \land \neg B) \Then Q_c$
+Ahora solo queda probar que  $(I \land \neg B) \Then Q$
 
 Donde
 \begin{align*}
 	I \land \neg B & \equiv |s| \leq i \leq |s| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes} \\
 	               & \equiv i = |s| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}             \\
-	               & \equiv \text{res} = \sum_{j=0}^{|s|-1} \text{ciudades}[j].\text{habitantes} \equiv Q_c              \\
+	               & \equiv \text{res} = \sum_{j=0}^{|s|-1} \text{ciudades}[j].\text{habitantes}                         \\
 \end{align*}
+
+Que es exactamente $Q$, y por lo tanto $(I \land \neg B) \Then Q \equiv Q \Then Q \equiv True$ QED.
+\bigskip
 
 De esta manera, queda demostrado que el programa es parcialmente correcto. Ahora solo queda demostrar que el programa efectivamente termina, en particular, que el ciclo termina en una cantidad finita de iteraciones. Esto se demuestra mediante el teorema de terminación.
 \bigskip
@@ -320,31 +352,31 @@ De esta manera, queda demostrado que el programa es parcialmente correcto. Ahora
 Según este teorema, si existe una función $f_v: \mathds{V} \to \ent$ tal que:
 
 \begin{enumerate}
-	\item \hoare{I \land B \land f_v = v_0}{S}{f_v < v_0}
+	\item \hoare{I \land B \land f_v = v_0}{S2}{f_v < v_0}
 	\item $(I \land f_v \leq 0) \Then \neg B$
 \end{enumerate}
 
-entonces la ejecución del ciclo \lstinline|while B do S endwhile| siempre termina.
+entonces la ejecución del ciclo S2 siempre termina.
 \bigskip
 
 Por lo cual, probamos si la función variante propuesta $f_v = |ciudades| - i$ cumple estas condiciones.
 \bigskip
 
 \begin{enumerate}
-	\item \hoare{I \land B \land f_v = v_0}{S}{f_v < v_0}
+	\item \hoare{I \land B \land f_v = v_0}{S2}{f_v < v_0}
 
-	      Sabemos que $\hoare{I \land B \land f_v = v_0}{S}{f_v < v_0} \iff (i \land B \land f_v = v_0) \Then \wp{S}{f_v < v_0}$, entonces:
+	      Sabemos que $\hoare{I \land B \land f_v = v_0}{S}{f_v < v_0} \iff (i \land B \land f_v = v_0) \Then \wp{S2}{f_v < v_0}$, entonces:
 
 	      \begin{align*}
-		      \wp{S}{f_v < v_0} & \equiv \wp{res := res + ciudades[i].habitantes; i := i + 1;}{|ciudades| - i < v_0} \\
-		                        & \equiv \wp{res := res + ciudades[i].habitantes}{\wp{i := i + 1}{f_v < v_0}}        \\
-		                        & \equiv \wp{res := res + ciudades[i].habitantes}{|ciudades| - i - 1 < v_0}          \\
-		                        & \equiv 0 \leq i < |ciduades| \land |ciudades| - i - 1 < v_0
+		      \wp{S2}{f_v < v_0} & \equiv \wp{res := res + ciudades[i].habitantes; i := i + 1;}{|ciudades| - i < v_0} \\
+		                         & \equiv \wp{res := res + ciudades[i].habitantes}{\wp{i := i + 1}{f_v < v_0}}        \\
+		                         & \equiv \wp{res := res + ciudades[i].habitantes}{|ciudades| - i - 1 < v_0}          \\
+		                         & \equiv 0 \leq i < |ciduades| \land |ciudades| - i - 1 < v_0
 	      \end{align*}
 
 	      Por lo tanto,
 	      \begin{align*}
-		       & (I \land B \land f_v = v_0) \Then \wp{S}{f_v < v_0}                                                                                                                                                                          \\
+		       & (I \land B \land f_v = v_0) \Then \wp{S2}{f_v < v_0}                                                                                                                                                                         \\
 		       & \equiv ((0 \leq i < |ciudades| \yLuego \underbrace{res = \sum_{j = 0}^{i - 1} ciudades[j].habitantes}_{\text{No me aporta nada en la implicación}}) \land i < |ciudades| \land |ciudades| - i = v_0) \Then \wp{S}{f_v < v_0} \\
 		       & \equiv (0 \leq i < |ciuades| \land |ciudades| - i = v_0) \Then (0 \leq i < |ciduades| \land |ciudades| - i - 1 < v_0)                                                                                                        \\
 		       & \equiv |ciudades| - i = v_0 \Then |ciudades| - i - 1 < v_0                                                                                                                                                                   \\
@@ -363,7 +395,34 @@ Por lo cual, probamos si la función variante propuesta $f_v = |ciudades| - i$ c
 	      \end{align*}
 \end{enumerate}
 
-De esta manera, queda demostrado que el ciclo termina en una cantidad finita de iteraciones, por lo que así, en conjunto con lo probado anteriormente, queda demostrado que la implementación es \textbf{correcta} con respecto a la especificación.
+De esta manera, queda demostrado que el ciclo termina en una cantidad finita de iteraciones, por lo que así, en conjunto con lo probado anteriormente, queda demostrado que la tripla de Hoare \hoare{Pc}{S2}{Q} es \textbf{correcta}.
+\bigskip
+
+{\large$P \Then \wp{S1}{Pc}$}
+\medskip
+
+Primero calculamos \wp{S1}{Pc}
+%
+\begin{align*}
+	\wp{S1}{Pc} & \equiv \wp{res := 0; i := 0}{res = 0 \land i = 0}      \\
+	            & \equiv \wp{res := 0}{\wp{i := 0}{res = 0 \land i = 0}} \\
+	            & \equiv \wp{res := 0}{res = 0 \land 0 = 0}              \\
+	            & \equiv 0 = 0 \land 0 = 0 \equiv True
+\end{align*}
+
+y como $P \Then \wp{S1}{Pc} \equiv P \Then True \equiv True$ QED.
+\bigskip
+
+Luego, como quedó demostrado que
+
+\begin{itemize}
+	\item $P \Then \wp{S1}{Pc}$
+	\item $\hoare{Pc}{S2}{Q}$
+\end{itemize}
+
+por corolario de monotonía $P \Then \wp{S}{Q}$, es decir, la tripla de Hoare \hoare{P}{S}{Q} es \textbf{válida}.
+
+\pagebreak
 
 \subsection{Correctitud b}
 Después de verificar la corrección del código anterior, podemos observar que la precondición implica nuestra WP calculada previamente. Esto, a su vez, demuestra, según la definición de precondición:
