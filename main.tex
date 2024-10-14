@@ -107,10 +107,10 @@ Consideramos como ``caminos válidos'' aquellos que conectan dos o más ciudades
 	}
 	\asegura[variaslineas]{
 		\neg existeCamino(distancias, origen, destino) \Then res = \langle \rangle \land \\
-		existeCamino(distancias, origen, destino) \Then (secuenciaEnMatriz(res, distancias) \yLuego \\
+		existeCamino(distancias, origen, destino) \Then (\paraTodo[unalinea]{i} {\ent}{enRango(i,res) \implicaLuego enRango(res[i], distancias)} \yLuego \\
 		caminoValido(res, distancias, origen, destino) \land \\
 		\paraTodo{c}{\TLista{\ent}}{
-			(secuenciaEnMatriz(c, distancias) \yLuego caminoValido(c, distancias, origen, destino)) \\
+			(\paraTodo[unalinea]{i} {\ent}{enRango(i,c) \implicaLuego enRango(c[i], distancias)} \yLuego caminoValido(c, distancias, origen, destino)) \\
 			\implicaLuego distanciaDeCamino(res, distancias) \leq distanciaDeCamino(c, distancias)
 		})
 	}
@@ -165,13 +165,9 @@ Consideramos como ``caminos válidos'' aquellos que conectan dos o más ciudades
 
 \pred{existeCamino}{distancias: \matrizEnt, desde: \ent, hasta: \ent} {
 	\existe {s} {\TLista{\ent}} {
-		secuenciaEnMatriz(s, distancias)  \yLuego caminoValido(s,distancias, desde, hasta)
+		\paraTodo[unalinea]{i} {\ent}{enRango(i,s) \implicaLuego enRango(s[i], distancias)}  \yLuego caminoValido(s,distancias, desde, hasta)
 	}
 }
-\pred{secuenciaEnMatriz}{secuencia: \TLista{\ent}, matriz: \matrizEnt} {
-	\paraTodo {i} {\ent}{enRango(i,secuencia) \implicaLuego enRango(secuencia[i], matriz)}
-}
-
 
 \pred{caminoValido}
 {camino: \TLista{\ent}, distancias: \matrizEnt, desde: \ent, hasta: \ent}
@@ -204,9 +200,6 @@ camino[0] = desde \land  camino[\longitud{camino} -1] = hasta \land \\
 }
 
 
-
-
-
 \section{Demostraciones de correctitud}
 
 \subsection{Correctiud}
@@ -221,19 +214,7 @@ while (i < |ciudades|) do
 endwhile
 \end{lstlisting}
 
-% \begin{algorithm}
-% 	\caption{Sumar habitantes de ciudades}
-% 	\begin{algorithmic}[1]
-% 		\State $res \gets 0$
-% 		\State $i \gets 0$
-% 		\While{$i < ciudades.length$}
-% 		\State $res \gets res + ciudades[i].habitantes$
-% 		\State $i \gets i + 1$
-% 		\EndWhile
-% 	\end{algorithmic}
-% \end{algorithm}
-
-Para probrar al correctitud de este codigo tiene que cumplirse la tripla de Hoare \hoare {P}{S}{Q}, que se prueba mostrando que $P \Then \wp{S}{Q}$
+Para probrar al correctitud de este codigo tiene que cumplirse la tripla de Hoare \hoare{P}{S}{Q}, que se prueba mostrando que $P \Then \wp{S}{Q}$
 
 Para esto, podemos pensar al programa $S$ como una sucesión de programas $S1;S2$:
 %
@@ -245,14 +226,14 @@ Para esto, podemos pensar al programa $S$ como una sucesión de programas $S1;S2
 De esta manera, si probamos que
 
 \begin{itemize}
-	\item $P \Then \wp{S1}{Pc}$
-	\item $Pc \Then \wp{S2}{Q}$
+	\item $P \Then \wp{S1}{P_c}$
+	\item $P_c \Then \wp{S2}{Q}$
 \end{itemize}
 
 entonces, por corolario de monotonía, $P \Then \wp{S}{Q}$, es decir, el programa es correcto.
 \bigskip
 
-{\large$Pc \Then \wp{S2}{Q}$}
+{\large$P_c \Then \wp{S2}{Q}$}
 \medskip
 
 Como $S2$ es un ciclo, no tenemos un axioma que nos permita calcular la \wp{S2}{Q}, sin embargo, podemos probar que la tripla de Hoare \hoare{Pc}{S2}{Q} es correcto mediante el teorema del invariante y el teorema de terminación.
@@ -269,29 +250,43 @@ Según el teorema de invariante, si existe un predicado $I$ tal que.. \par
 Entonces el programa $S2$ es parcialmente correcto con respecto a la especificación.
 \bigskip
 
+Para simplificar la escritura, vamos a definir unos predicados:
+%
+\begin{align*}
+	hayCiudadGrande \equiv     & \existe[unalinea]{i}{\ent}{0 \leq i < |ciudades| \yLuego ciudades[i].habitantes > 50000}                                          \\
+	habitantesPositivos \equiv & \paraTodo[unalinea]{i}{\ent}{0 \leq i < |ciudades| \implicaLuego ciudades[i].habitantes \geq 0}                                   \\
+	ciudadesUnicas \equiv      & (\forall i: \ent)\paraTodo[unalinea]{j}{\ent}{0 \leq i < j < |ciudades| \implicaLuego ciudades[i].nombre \neq ciudades[j].nombre} \\
+	C \equiv                   & hayCiudadGrande \land habitantesPositivos
+\end{align*}
+
 Sea \( Q\) la poscondición y \( B \) la guarda del bucle `while`.
 
 La relación entre estas condiciones es la siguiente:
 %
 \begin{align*}
-	P_c & \equiv \{ \text{res} = 0 \land i = 0 \}                                                                                   \\
-	Q   & \equiv \left\{ \text{res} = \sum_{i=0}^{|\text{ciudades}|-1} \text{ciudades}[i].\text{habitantes} \right\}                \\
-	B   & \equiv \{ i < |ciudades| \}                                                                                               \\
-	I   & \equiv \left\{ 0 \leq i \leq |\text{s}| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes} \right\} \\
-	f_v & \equiv \left\{ |ciudades| - i \right\}
+	P \equiv   & \{C \land ciudadesUnicas \}                                                                                                         \\
+	P_c \equiv & \{C \land res = 0 \land i = 0\}                                                                                                     \\
+	Q   \equiv & \left\{\text{res} = \sum_{i=0}^{|\text{ciudades}|-1} \text{ciudades}[i].\text{habitantes} \right\}                                  \\
+	B   \equiv & \{ i < |ciudades| \}                                                                                                                \\
+	I   \equiv & \left\{ C \land 0 \leq i \leq |\text{ciudades}| \yLuego \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes} \right\} \\
+	f_v \equiv & \left\{ |ciudades| - i \right\}
 \end{align*}
 
 Para demostrar que \( P_c \implies I \), verificamos lo siguiente:
 
 \begin{enumerate}
-	\item Demostración de \( 0 \leq i \leq |s| \):
-	\item
+	\item Demostración de $C$:
+
+	      Claramente si vale $P_c$ en particular vale $C$, por lo que $C \Then C \equiv True$.
+
+	\item Demostración de \( 0 \leq i \leq |ciudades| \):
+
 	      Asumiendo que vale el antecedente, se tiene que
 	      \[
-		      i = 0 \land 0 \leq i \leq |s| \equiv 0 \leq 0 \leq |s|
+		      i = 0 \land 0 \leq i \leq |ciudades| \equiv 0 \leq 0 \leq |ciudades|
 	      \]
 
-	      Esto es cierto ya que claramente \( 0 \leq |s| \), donde \( |s| \) es la longitud del array de ciudades. Por lo tanto, se cumple \( 0 \leq 0 \leq |s| \).
+	      Esto es cierto ya que claramente \( 0 \leq |ciudades| \). Por lo tanto, se cumple \( 0 \leq 0 \leq |s| \).
 
 	\item Demostración de la sumatoria en \( I \):
 
@@ -316,19 +311,22 @@ Para demostrar que \hoare{I \land B}{S2}{I}:
 Sabemos que $\hoare{I \land B}{S2}{I} \iff (I \land B) \implica \wp{S2}{I}$. Entonces:
 
 \begin{align*}
-	\wp{S2}{I} & \equiv  \wp{ res := res + ciudades[i].habitantes; i := i + 1}{0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes}      \\
-	           & \equiv  \wp{ res := res + ciudades[i].habitantes}{\wp{i := i + 1}{0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes}} \\
-	           & \equiv  \wp{ res := res + ciudades[i].habitantes}{0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1 + 1} ciudades[j].habitantes}            \\
-	           & \equiv  \wp{ res := res + ciudades[i].habitantes}{0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes}                  \\
-	           & \equiv  \Def{ciudades[i]} \yLuego -1 \leq i \leq |ciudades| -1 \yLuego res + ciudades[i].habitantes = \sum_{j=0}^{i} ciudades[j].habitantes        \\
-	           & \equiv  0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes - ciudades[i].habitantes                                      \\
-	           & \equiv  0 \leq i \leq |ciudades|  \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes
+	\wp{S2}{I} & \equiv  \wp{ res := res + ciudades[i].habitantes; i := i + 1}{C \land 0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes}      \\
+	           & \equiv  \wp{ res := res + ciudades[i].habitantes}{\wp{i := i + 1}{C \land 0 \leq i \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes}} \\
+	           & \equiv  \wp{ res := res + ciudades[i].habitantes}{C \land 0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i-1 + 1} ciudades[j].habitantes}            \\
+	           & \equiv  \wp{ res := res + ciudades[i].habitantes}{C \land 0 \leq i+1 \leq |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes}                  \\
+	           & \equiv  \Def{ciudades[i]} \yLuego C \land -1 \leq i \leq |ciudades| -1 \yLuego res + ciudades[i].habitantes = \sum_{j=0}^{i} ciudades[j].habitantes        \\
+	           & \equiv  C \land 0 \leq i < |ciudades| \yLuego res = \sum_{j=0}^{i} ciudades[j].habitantes - ciudades[i].habitantes                                         \\
+	           & \equiv  C \land 0 \leq i < |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes
 \end{align*}
 
 
 Entonces $\ensuremath{I \land B}$  \implica \wp{S2}{I}?
 
-\[{I \land B}  \equiv  0 \leq i \leq |ciudades|  \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes \]
+\begin{align*}
+	{I \land B}  \equiv & C \land 0 \leq i \leq |ciudades|  \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes \land i < |ciudades| \\
+	\equiv              & C \land 0 \leq i < |ciudades| \yLuego res = \sum_{j=0}^{i-1} ciudades[j].habitantes
+\end{align*}
 
 Que es exactamente \wp{S2}{I}, y por lo tanto $I \land B \Then\wp{S2}{I} \equiv \wp{S2}{I} \Then \wp{S2}{I} \equiv True$ QED.
 
@@ -338,12 +336,12 @@ Ahora solo queda probar que  $(I \land \neg B) \Then Q$
 
 Donde
 \begin{align*}
-	I \land \neg B & \equiv |s| \leq i \leq |s| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes} \\
-	               & \equiv i = |s| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}             \\
-	               & \equiv \text{res} = \sum_{j=0}^{|s|-1} \text{ciudades}[j].\text{habitantes}                         \\
+	I \land \neg B & \equiv C \land |ciudades| \leq i \leq |ciudades| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes} \\
+	               & \equiv C \land i = |ciudades| \land \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}                    \\
+	               & \equiv C \land \text{res} = \sum_{j=0}^{|ciudades|-1} \text{ciudades}[j].\text{habitantes}                                \\
 \end{align*}
 
-Que es exactamente $Q$, y por lo tanto $(I \land \neg B) \Then Q \equiv Q \Then Q \equiv True$ QED.
+Que es exactamente $C \land Q$, y por lo tanto $(I \land \neg B) \Then Q \equiv (C \land Q) \Then Q \equiv True$ QED.
 \bigskip
 
 De esta manera, queda demostrado que el programa es parcialmente correcto. Ahora solo queda demostrar que el programa efectivamente termina, en particular, que el ciclo termina en una cantidad finita de iteraciones. Esto se demuestra mediante el teorema de terminación.
@@ -365,7 +363,7 @@ Por lo cual, probamos si la función variante propuesta $f_v = |ciudades| - i$ c
 \begin{enumerate}
 	\item \hoare{I \land B \land f_v = v_0}{S2}{f_v < v_0}
 
-	      Sabemos que $\hoare{I \land B \land f_v = v_0}{S}{f_v < v_0} \iff (i \land B \land f_v = v_0) \Then \wp{S2}{f_v < v_0}$, entonces:
+	      Sabemos que $\hoare{I \land B \land f_v = v_0}{S}{f_v < v_0} \iff (I \land B \land f_v = v_0) \Then \wp{S2}{f_v < v_0}$, entonces:
 
 	      \begin{align*}
 		      \wp{S2}{f_v < v_0} & \equiv \wp{res := res + ciudades[i].habitantes; i := i + 1;}{|ciudades| - i < v_0} \\
@@ -376,11 +374,11 @@ Por lo cual, probamos si la función variante propuesta $f_v = |ciudades| - i$ c
 
 	      Por lo tanto,
 	      \begin{align*}
-		       & (I \land B \land f_v = v_0) \Then \wp{S2}{f_v < v_0}                                                                                                                                                                         \\
-		       & \equiv ((0 \leq i < |ciudades| \yLuego \underbrace{res = \sum_{j = 0}^{i - 1} ciudades[j].habitantes}_{\text{No me aporta nada en la implicación}}) \land i < |ciudades| \land |ciudades| - i = v_0) \Then \wp{S}{f_v < v_0} \\
-		       & \equiv (0 \leq i < |ciuades| \land |ciudades| - i = v_0) \Then (0 \leq i < |ciduades| \land |ciudades| - i - 1 < v_0)                                                                                                        \\
-		       & \equiv |ciudades| - i = v_0 \Then |ciudades| - i - 1 < v_0                                                                                                                                                                   \\
-		       & \equiv |ciudades| - i - 1 < |ciudades| - i                                                                                                                                                                                   \\
+		       & (I \land B \land f_v = v_0) \Then \wp{S2}{f_v < v_0}                                                                                                                                                                                 \\
+		       & \equiv ((0 \leq i < |ciudades| \yLuego \underbrace{C \land res = \sum_{j = 0}^{i - 1} ciudades[j].habitantes}_{\text{No me aporta nada en la implicación}}) \land i < |ciudades| \land |ciudades| - i = v_0) \Then \wp{S}{f_v < v_0} \\
+		       & \equiv (0 \leq i < |ciuades| \land |ciudades| - i = v_0) \Then (0 \leq i < |ciduades| \land |ciudades| - i - 1 < v_0)                                                                                                                \\
+		       & \equiv |ciudades| - i = v_0 \Then |ciudades| - i - 1 < v_0                                                                                                                                                                           \\
+		       & \equiv |ciudades| - i - 1 < |ciudades| - i                                                                                                                                                                                           \\
 		       & \equiv -1 < 0 \equiv True
 	      \end{align*}
 
@@ -388,9 +386,9 @@ Por lo cual, probamos si la función variante propuesta $f_v = |ciudades| - i$ c
 
 	      Tenemos que
 	      \begin{align*}
-		      (I \land f_v \leq 0) \Then \neg B & \equiv ((0 \leq i \leq |ciudades| \yLuego \underbrace{res = \sum_{j = 0}^{i - 1} ciudades[j].habitantes}_{\text{No me aporta nada en la implicación}}) \land |ciudades| - i \leq 0) \Then i \geq |ciudades| \\
-		                                        & \equiv (0 \leq i \leq |ciudades| \land |ciudades| \leq i) \Then i \geq |ciduades|                                                                                                                           \\
-		                                        & \equiv i = |ciudades| \Then i \geq |ciudades|                                                                                                                                                               \\
+		      (I \land f_v \leq 0) \Then \neg B & \equiv ((0 \leq i \leq |ciudades| \yLuego \underbrace{C \land res = \sum_{j = 0}^{i - 1} ciudades[j].habitantes}_{\text{No me aporta nada en la implicación}}) \land |ciudades| - i \leq 0) \Then i \geq |ciudades| \\
+		                                        & \equiv (0 \leq i \leq |ciudades| \land |ciudades| \leq i) \Then i \geq |ciduades|                                                                                                                                   \\
+		                                        & \equiv i = |ciudades| \Then i \geq |ciudades|                                                                                                                                                                       \\
 		                                        & \equiv |ciudades| \geq |ciudades| \equiv True
 	      \end{align*}
 \end{enumerate}
@@ -398,26 +396,26 @@ Por lo cual, probamos si la función variante propuesta $f_v = |ciudades| - i$ c
 De esta manera, queda demostrado que el ciclo termina en una cantidad finita de iteraciones, por lo que así, en conjunto con lo probado anteriormente, queda demostrado que la tripla de Hoare \hoare{Pc}{S2}{Q} es \textbf{correcta}.
 \bigskip
 
-{\large$P \Then \wp{S1}{Pc}$}
+{\large$P \Then \wp{S1}{P_c}$}
 \medskip
 
 Primero calculamos \wp{S1}{Pc}
 %
 \begin{align*}
-	\wp{S1}{Pc} & \equiv \wp{res := 0; i := 0}{res = 0 \land i = 0}      \\
-	            & \equiv \wp{res := 0}{\wp{i := 0}{res = 0 \land i = 0}} \\
-	            & \equiv \wp{res := 0}{res = 0 \land 0 = 0}              \\
-	            & \equiv 0 = 0 \land 0 = 0 \equiv True
+	\wp{S1}{P_c} & \equiv \wp{res := 0; i := 0}{C \land res = 0 \land i = 0}      \\
+	             & \equiv \wp{res := 0}{\wp{i := 0}{C \land res = 0 \land i = 0}} \\
+	             & \equiv \wp{res := 0}{C \land res = 0 \land 0 = 0}              \\
+	             & \equiv C \land 0 = 0 \land 0 = 0 \equiv C
 \end{align*}
 
-y como $P \Then \wp{S1}{Pc} \equiv P \Then True \equiv True$ QED.
+y como $P \Then \wp{S1}{P_c} \equiv (C \land ciudadesUnicas) \Then C \equiv True$ QED.
 \bigskip
 
 Luego, como quedó demostrado que
 
 \begin{itemize}
-	\item $P \Then \wp{S1}{Pc}$
-	\item $\hoare{Pc}{S2}{Q}$
+	\item $P \Then \wp{S1}{P_c}$
+	\item $\hoare{P_c}{S2}{Q}$
 \end{itemize}
 
 por corolario de monotonía $P \Then \wp{S}{Q}$, es decir, la tripla de Hoare \hoare{P}{S}{Q} es \textbf{válida}.
@@ -425,20 +423,43 @@ por corolario de monotonía $P \Then \wp{S}{Q}$, es decir, la tripla de Hoare \h
 \pagebreak
 
 \subsection{Correctitud b}
-Después de verificar la corrección del código anterior, podemos observar que la precondición implica nuestra WP calculada previamente. Esto, a su vez, demuestra, según la definición de precondición:
+
+Para probar que $res > 50000$ definimos una nueva postcondición $Q'$:
+
+\[Q' \equiv \left\{\text{res} = \sum_{i=0}^{|\text{ciudades}|-1} \text{ciudades}[i].\text{habitantes} \land res > 50000\right\}\]
+
+De esta manera, nos alcanza con probar que la tripla de Hoare \hoare{P}{S}{Q'} es válida.
+\bigskip
+
+Como lo único que cambia con respecto al ítem anterior es la postcondición, y solamente está involucrada en el tercer punto de la demostración del teorema del invariante, no es necesario volver a demostrar todo lo demás, ya que es exactamente igual al ítem anterior y, por lo tanto, ya está demostrado.
 \medskip
 
-Definición: \textit{Una precondición es una condición sobre los argumentos que el programador asume como verdadera. Especifica lo que la función requiere para llevar a cabo su tarea correctamente.}
+Teniendo en cuenta eso, es suficiente con demostrar únicamente el tercer punto del teorema del invariante: $(I \land \neg B) \Then Q'$
 \medskip
 
-En este caso, la precondición establece que
+Tenemos que
+%
 \begin{align*}
-	 & \existe[unalinea]{i}{\ent}{0 \leq i < |ciudades| \yLuego ciudades[i].habitantes > 50.000} \land \\
-	 & \paraTodo[unalinea]{i}{\ent}{0 \leq i < |ciudades| \implicaLuego ciudades[i].habitantes \geq 0}
+	I \land \neg B \equiv & C \land 0 \leq i \leq |\text{ciudades}| \yLuego \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes} \land i \geq |ciudades| \\
+	\equiv                & C \land |ciudades| \leq i \leq |\text{ciudades}| \yLuego \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}                \\
+	\equiv                & C \land i = |ciudades| \yLuego \text{res} = \sum_{j=0}^{i-1} \text{ciudades}[j].\text{habitantes}                                          \\
+	\equiv                & C \land res = \sum_{j=0}^{|ciudades| - 1} \text{ciudades}[j].\text{habitantes}
 \end{align*}
-Esto nos asegura que siempre se devolverá un resultado mayor a 50,000, ya que es un requisito impuesto por la precondición.
-\medskip
 
-Por lo tanto, nuestra implementación, que sigue el procedimiento descrito, suma a res los habitantes de una ciudad. Según la precondición, debe existir al menos una ciudad cuyos habitantes sean más de 50,000 y todas deben tener una cantidad positiva de habitantes. Esto garantiza que el valor de res será mayor a 50,000, ya que siempre existe al menos una ciudad que cumple con dicha condición.
+Entonces $(I \land \neg B) \Then Q'$?
+%
+\begin{enumerate}
+	\item Demostración de la sumatoria:
 
+	      Vemos que claramente si vale $I \land \neg B$, en particular vale $res = \sum_{j=0}^{|ciudades| - 1} \text{ciudades}[j].\text{habitantes}$, que es la primera parte de la $Q'$
+
+	\item Demostración de $res > 50000$:
+
+	      Si vale $I \land \neg B$, entonces vale $C$ (existe una ciudad con más de 50000 habitantes y todas tienen una cantidad positiva de habitantes) y $res$ es la suma de los habitantes de todas las ciudades, por lo que claramente $res > 50000$.
+\end{enumerate}
+
+Por lo tanto $(I \land \neg B) \Then Q'$ es verdadero.
+\bigskip
+
+De esta manera, en conjunto con las demostraciónes del ítem anterior, la tripla de Hoare \hoare{P}{S}{Q'} es válida y por lo tanto queda probado que el resultado devuelto por el programa efectivamente es mayor a 50000.
 \end{document}
